@@ -1,5 +1,5 @@
 import { NodeTypeEnum } from "../../src/Node/enums/NodeTypeEnum";
-import { Node } from "../../src/Node/Node";
+import { Node } from "../../src/Node";
 
 test("Two variation nodes should be equal if they share the same id", () => {
     const nodeA = new Node(0, NodeTypeEnum.Hidden);

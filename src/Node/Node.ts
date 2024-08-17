@@ -1,5 +1,5 @@
 import { NodeTypeEnum } from "./enums/NodeTypeEnum";
-import { INode } from "./interfaces/INode";
+import { INode } from "./interfaces";
 
 export class Node implements INode {
     id:   number;

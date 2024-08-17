@@ -1,5 +1,5 @@
 import { NodeTypeEnum } from "./enums/NodeTypeEnum";
-import { INodeVariation } from "./interfaces/INodeVariation";
+import { INodeVariation } from "./interfaces";
 import { Node } from "./Node";
 
 export class NodeVariation extends Node implements INodeVariation {

@@ -15,4 +15,4 @@ test("Two connection ids should be equal if both their in and out nodes are the 
     const conIdD = new ConnectionId(inB, outA);
     expect(conIdA.equals(conIdC)).toStrictEqual(false);
     expect(conIdA.equals(conIdD)).toStrictEqual(false);
-})
+});

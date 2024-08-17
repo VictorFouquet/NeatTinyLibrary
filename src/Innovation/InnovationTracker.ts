@@ -3,8 +3,8 @@ import { ConnectionId } from "../Connection/ConnectionId";
 import { IConnection } from "../Connection/interfaces/IConnection";
 import { IConnectionId } from "../Connection/interfaces/IConnectionId";
 import { NodeTypeEnum } from "../Node/enums/NodeTypeEnum";
-import { INode } from "../Node/interfaces/INode";
-import { Node } from "../Node/Node"
+import { INode } from "../Node/interfaces";
+import { Node } from "../Node"
 import  {
     ConnectionExistError,
     InputLinkageError,
