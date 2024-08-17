@@ -5,10 +5,12 @@ import { IConnectionId } from "../Connection/interfaces/IConnectionId";
 import { NodeTypeEnum } from "../Node/enums/NodeTypeEnum";
 import { INode } from "../Node/interfaces/INode";
 import { Node } from "../Node/Node"
-import { ConnectionExistError } from "./errors/ConnectionExistError";
-import { InputLinkageError } from "./errors/InputLinkageError";
-import { OutputLinkageError } from "./errors/OutputLinkageError";
-import { UnknownNodeError } from "./errors/UnknownNodeError";
+import  {
+    ConnectionExistError,
+    InputLinkageError,
+    OutputLinkageError,
+    UnknownNodeError
+} from "./errors";
 
 export class InnovationTracker {
     static nodes:      INode[] = [];
