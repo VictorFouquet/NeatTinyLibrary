@@ -1,9 +1,11 @@
 import { ConnectionId } from "../../src/Connection";
-import { ConnectionExistError } from "../../src/Innovation/errors/ConnectionExistError";
-import { InputLinkageError } from "../../src/Innovation/errors/InputLinkageError";
-import { OutputLinkageError } from "../../src/Innovation/errors/OutputLinkageError";
-import { UnknownNodeError } from "../../src/Innovation/errors/UnknownNodeError";
-import { InnovationTracker } from "../../src/Innovation/InnovationTracker";
+import { 
+    ConnectionExistError,
+    InputLinkageError,
+    InnovationTracker,
+    OutputLinkageError,
+    UnknownNodeError
+} from "../../src/Innovation";
 
 afterEach(() => {
     InnovationTracker.clear();

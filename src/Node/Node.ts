@@ -1,4 +1,4 @@
-import { NodeTypeEnum } from "./enums/NodeTypeEnum";
+import { NodeTypeEnum } from "./enums";
 import { INode } from "./interfaces";
 
 export class Node implements INode {

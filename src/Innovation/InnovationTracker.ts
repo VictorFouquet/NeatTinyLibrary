@@ -4,15 +4,20 @@ import {
     IConnection,
     IConnectionId
 } from "../Connection";
-import { NodeTypeEnum } from "../Node/enums/NodeTypeEnum";
-import { INode } from "../Node/interfaces";
-import { Node } from "../Node"
+
+import {
+    INode,
+    Node,
+    NodeTypeEnum
+} from "../Node";
+
 import  {
     ConnectionExistError,
     InputLinkageError,
     OutputLinkageError,
     UnknownNodeError
 } from "./errors";
+
 
 export class InnovationTracker {
     static nodes:      INode[] = [];

@@ -1,4 +1,4 @@
-import { NodeTypeEnum } from "./enums/NodeTypeEnum";
+import { NodeTypeEnum } from "./enums";
 import { INodeVariation } from "./interfaces";
 import { Node } from "./Node";
 

@@ -1,5 +1,4 @@
-import { NodeTypeEnum } from "../../src/Node/enums/NodeTypeEnum";
-import { NodeVariation } from "../../src/Node";
+import { NodeTypeEnum, NodeVariation } from "../../src/Node";
 
 
 test("A variation node should make a deep copy of itself", () => {

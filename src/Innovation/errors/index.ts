@@ -1,9 +1,5 @@
-import { ConnectionExistError } from "./ConnectionExistError";
-import { InputLinkageError } from "./InputLinkageError";
-import { OutputLinkageError } from "./OutputLinkageError";
-import { UnknownNodeError } from "./UnknownNodeError";
-
-export { ConnectionExistError };
-export { InputLinkageError };
-export { OutputLinkageError };
-export { UnknownNodeError };
+export * from "./enums"
+export { ConnectionExistError } from "./ConnectionExistError";
+export { InputLinkageError } from "./InputLinkageError";
+export { OutputLinkageError } from "./OutputLinkageError";
+export { UnknownNodeError } from "./UnknownNodeError";
