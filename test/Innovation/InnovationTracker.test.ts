@@ -1,4 +1,4 @@
-import { ConnectionId } from "../../src/Connection/ConnectionId";
+import { ConnectionId } from "../../src/Connection";
 import { ConnectionExistError } from "../../src/Innovation/errors/ConnectionExistError";
 import { InputLinkageError } from "../../src/Innovation/errors/InputLinkageError";
 import { OutputLinkageError } from "../../src/Innovation/errors/OutputLinkageError";

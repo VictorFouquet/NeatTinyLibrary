@@ -1,5 +1,4 @@
-import { Connection } from "../../src/Connection/Connection";
-import { ConnectionId } from "../../src/Connection/ConnectionId";
+import { Connection, ConnectionId } from "../../src/Connection";
 
 test("Two connection should be equal if they share the same connection id", () => {
     const connectionIdA = new ConnectionId(0, 1);

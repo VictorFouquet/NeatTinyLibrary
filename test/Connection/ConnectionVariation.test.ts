@@ -1,5 +1,4 @@
-import { ConnectionId } from "../../src/Connection/ConnectionId";
-import { ConnectionVariation } from "../../src/Connection/ConnectionVariation";
+import { ConnectionId, ConnectionVariation } from "../../src/Connection";
 
 test("A connection variation should create a deep copy of itself", () => {
     const conVarA = new ConnectionVariation(new ConnectionId(0, 1), 0);

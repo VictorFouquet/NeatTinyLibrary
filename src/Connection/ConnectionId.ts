@@ -1,4 +1,4 @@
-import { IConnectionId } from "./interfaces/IConnectionId";
+import { IConnectionId } from "./interfaces";
 
 export class ConnectionId implements IConnectionId {
     readonly in:  number;

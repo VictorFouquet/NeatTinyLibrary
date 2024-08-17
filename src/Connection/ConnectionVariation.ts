@@ -1,6 +1,6 @@
 import { Connection } from "./Connection";
 import { ConnectionId } from "./ConnectionId";
-import { IConnectionVariation } from "./interfaces/IConnectionVariation";
+import { IConnectionVariation } from "./interfaces";
 
 export class ConnectionVariation extends Connection implements IConnectionVariation {
     weight:  number;

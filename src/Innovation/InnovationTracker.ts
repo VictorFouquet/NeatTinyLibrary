@@ -1,7 +1,9 @@
-import { Connection } from "../Connection/Connection";
-import { ConnectionId } from "../Connection/ConnectionId";
-import { IConnection } from "../Connection/interfaces/IConnection";
-import { IConnectionId } from "../Connection/interfaces/IConnectionId";
+import {
+    Connection,
+    ConnectionId,
+    IConnection,
+    IConnectionId
+} from "../Connection";
 import { NodeTypeEnum } from "../Node/enums/NodeTypeEnum";
 import { INode } from "../Node/interfaces";
 import { Node } from "../Node"

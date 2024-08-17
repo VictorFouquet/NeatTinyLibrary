@@ -1,5 +1,4 @@
-import { IConnection } from "./interfaces/IConnection";
-import { IConnectionId } from "./interfaces/IConnectionId";
+import { IConnection, IConnectionId } from "./interfaces";
 
 export class Connection implements IConnection {
     id:  IConnectionId;

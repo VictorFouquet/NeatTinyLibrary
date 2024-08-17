@@ -1,4 +1,4 @@
-import { ConnectionId } from "../../src/Connection/ConnectionId";
+import { ConnectionId } from "../../src/Connection";
 
 test("Two connection ids should be equal if both their in and out nodes are the same", () => {
     const inA = 0;
