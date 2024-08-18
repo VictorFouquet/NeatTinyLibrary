@@ -11,21 +11,27 @@ test("A connection variation should create a deep copy of itself", () => {
     expect(conVarA.equals(conVarB)).toStrictEqual(true);
 });
 
-test("A connection variation should make a deep copy of itself and mutate its weight", () => {
+test("A connection variation should mutate its weight", () => {
     const initWeight = 1;
-    const conVarA = new ConnectionVariation(new ConnectionId(0, 1), initWeight);
-    const mutated = conVarA.mutateWeight();
 
+    const conVarA = new ConnectionVariation(new ConnectionId(0, 1), initWeight);
     expect(conVarA.weight).toStrictEqual(initWeight);
-    expect(mutated.equals(conVarA)).toStrictEqual(true);
-    expect(mutated.weight).not.toStrictEqual(initWeight);
+
+    conVarA.mutateWeight();
+    expect(conVarA.weight).not.toStrictEqual(initWeight);
 });
 
-test("A connection variation should make a deep copy of itself and switch its enabled", () => {
-    const conVarA = new ConnectionVariation(new ConnectionId(0, 1), 0, true);
-    const mutated = conVarA.mutateEnabled();
+test("A connection variation should tweak its node by 10% max", () => {
+    const conVarA = new ConnectionVariation(new ConnectionId(0, 1), 1, true);
+    conVarA.shiftWeight();
+    expect(conVarA.weight).toBeGreaterThanOrEqual(0.9);
+    expect(conVarA.weight).toBeLessThanOrEqual(1.1);
+});
 
+test("A connection variation should switch its enabled state", () => {
+    const conVarA = new ConnectionVariation(new ConnectionId(0, 1), 0, true);
     expect(conVarA.enabled).toStrictEqual(true);
-    expect(mutated.equals(conVarA)).toStrictEqual(true);
-    expect(mutated.enabled).toStrictEqual(false);
+
+    conVarA.mutateEnabled();
+    expect(conVarA.enabled).toStrictEqual(false);
 });
