@@ -6,5 +6,6 @@ export interface IConnectionVariation extends IConnection {
 
     copy():          IConnectionVariation;
     mutateWeight():  IConnectionVariation;
+    shiftWeight():   IConnectionVariation;
     mutateEnabled(): IConnectionVariation;
 }

@@ -13,19 +13,21 @@ export class ConnectionVariation extends Connection implements IConnectionVariat
     }
 
     mutateWeight() : IConnectionVariation {
-        const variation = this.copy();
+        this.weight = Math.random();
 
-        variation.weight = Math.random();
+        return this;
+    }
 
-        return variation;
+    shiftWeight(): IConnectionVariation {
+        const shift = (this.weight - 2 * this.weight * Math.random()) * 0.1;
+        this.weight += shift;
+        return this;
     }
 
     mutateEnabled() : IConnectionVariation {
-        const variation = this.copy();
+        this.enabled = !this.enabled;
 
-        variation.enabled = !variation.enabled;
-
-        return variation;
+        return this;
     }
 
     copy() : IConnectionVariation {
