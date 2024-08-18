@@ -20,14 +20,25 @@ import  {
 
 
 export class InnovationTracker {
-    static nodes:      INode[] = [];
-    static nodesCount: number = 0;
+    private static _nodes:      INode[] = [];
+    private static _nodesCount: number = 0;
 
-    static connections:      IConnection[] = [];
-    static connectionsCount: number = 0;
+    private static _connections:      IConnection[] = [];
+    private static _connectionsCount: number = 0;
+
+    //#region Getters
+    static get nodesCount(): number { return InnovationTracker._nodesCount; }
+    static get nodes(): INode[] { return InnovationTracker._nodes.slice(); }
+    static get inputNodes(): INode[] { return InnovationTracker._nodes.filter(n => n.isInput); }
+    static get hiddenNodes(): INode[] { return InnovationTracker._nodes.filter(n => n.isHidden); }
+    static get outputNodes(): INode[] { return InnovationTracker._nodes.filter(n => n.isOutput); }
+    
+    static get connectionsCount(): number { return InnovationTracker._connectionsCount; }
+    static get connections(): IConnection[] { return InnovationTracker._connections.slice(); }
+    //#endregion
 
     static init(inputs: number, outputs: number): void {
-        if (InnovationTracker.connectionsCount !== 0 || InnovationTracker.nodesCount !== 0)
+        if (InnovationTracker._connectionsCount !== 0 || InnovationTracker._nodesCount !== 0)
             InnovationTracker.clear();
 
         for (let i = 0; i < inputs; i++) {
@@ -36,22 +47,24 @@ export class InnovationTracker {
         for (let i = 0; i < outputs; i++) {
             InnovationTracker.createOutputNode();
         }
+
+        for (let input of InnovationTracker.inputNodes) {
+            for (let output of InnovationTracker.outputNodes) {
+                InnovationTracker.getOrCreateConnection(new ConnectionId(input.id, output.id));
+            }
+        }
     }
 
     static clear(): void {
-        InnovationTracker.nodes = [];
-        InnovationTracker.nodesCount = 0;
-        InnovationTracker.connections = [];
-        InnovationTracker.connectionsCount = 0;
+        InnovationTracker._nodes = [];
+        InnovationTracker._nodesCount = 0;
+        InnovationTracker._connections = [];
+        InnovationTracker._connectionsCount = 0;
     }
 
     //#region Nodes
     private static createInputNode(): INode { // Only callable by the init function
         return InnovationTracker.createNodeInternal(NodeTypeEnum.Input);
-    }
-
-    static getInputNodes(): INode[] {
-        return InnovationTracker.nodes.filter(n => n.isInput());
     }
 
     static createHiddenNode(): INode {
@@ -62,12 +75,8 @@ export class InnovationTracker {
         return InnovationTracker.createNodeInternal(NodeTypeEnum.Output);
     }
 
-    static getOutputNodes(): INode[] {
-        return InnovationTracker.nodes.filter(n => n.isOutput());
-    }
-
     static getNodeById(id: number): INode|null {
-        const node = InnovationTracker.nodes.filter((n: INode) => n.id === id);
+        const node = InnovationTracker._nodes.filter((n: INode) => n.id === id);
         
         return node.length ? node[0] : null;
     }
@@ -77,13 +86,13 @@ export class InnovationTracker {
     }
 
     private static createNodeInternal(type: NodeTypeEnum) {
-        InnovationTracker.nodesCount++;
+        InnovationTracker._nodesCount++;
 
         const node = new Node(
-            InnovationTracker.nodesCount,
+            InnovationTracker._nodesCount,
             type
         );
-        InnovationTracker.nodes.push(node);
+        InnovationTracker._nodes.push(node);
 
         return node;
     }
@@ -93,17 +102,21 @@ export class InnovationTracker {
     static createConnection(_in: number, out: number): IConnection {
         InnovationTracker.assertLegalConnexion(_in, out)
 
-        InnovationTracker.connectionsCount++;
+        InnovationTracker._connectionsCount++;
         const connection = new Connection(new ConnectionId(_in, out));
-        InnovationTracker.connections.push(connection);
+        InnovationTracker._connections.push(connection);
 
         return connection;
     }
 
     static getConnection(id: IConnectionId): IConnection|null {
-        const connection = InnovationTracker.connections.filter((c: IConnection) => c.id.equals(id));
+        const connection = InnovationTracker._connections.filter((c: IConnection) => c.id.equals(id));
         
         return connection.length === 1 ? connection[0] : null;
+    }
+
+    static getOrCreateConnection(id: IConnectionId): IConnection {
+        return InnovationTracker.getConnection(id) ?? InnovationTracker.createConnection(id.in, id.out);
     }
 
     static connectionExists(id: IConnectionId): boolean {
@@ -128,8 +141,8 @@ export class InnovationTracker {
 
     private static assertNoInputConnection(_in: number, out: number) {
         if (
-            InnovationTracker.getNodeById(_in)?.isInput() &&
-            InnovationTracker.getNodeById(out)?.isInput()
+            InnovationTracker.getNodeById(_in)?.isInput &&
+            InnovationTracker.getNodeById(out)?.isInput
         ) {
             throw new InputLinkageError(_in, out);
         }
@@ -137,8 +150,8 @@ export class InnovationTracker {
 
     private static assertNoOutputConnection(_in: number, out: number) {
         if (
-            InnovationTracker.getNodeById(_in)?.isOutput() &&
-            InnovationTracker.getNodeById(out)?.isOutput()
+            InnovationTracker.getNodeById(_in)?.isOutput &&
+            InnovationTracker.getNodeById(out)?.isOutput
         ) {
             throw new OutputLinkageError(_in, out);
         }
