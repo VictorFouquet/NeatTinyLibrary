@@ -1,0 +1,1 @@
+export { IGenome } from "./IGenome";
