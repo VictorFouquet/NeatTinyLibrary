@@ -15,16 +15,17 @@ export interface IGenome {
     filterInputNodes():  INodeVariation[];
     filterOutputNodes(): INodeVariation[];
 
-    addConnection():                                IConnectionVariation;
     getConnection(id: IConnectionId):               IConnectionVariation|null;
+    getRandomConnection():                          IConnectionVariation;
+    addConnection():                                IConnectionVariation;
     mutateConnectionWeight(id: IConnectionId):      IConnectionVariation;
     mutateConnectionWeightShift(id: IConnectionId): IConnectionVariation
     mutateConnectionEnabled(id: IConnectionId):     IConnectionVariation;
     containsConnection(id: IConnectionId):          boolean;
 
-    addNode():                  INodeVariation;
     getNode(id: number):        INodeVariation|null;
     getRandomNode():            INodeVariation;
+    addNode():                  INodeVariation;
     mutateNodeBias(id: number): INodeVariation;
     removeNode(id: number):     INodeVariation;
     containsNode(id: number):   boolean;
