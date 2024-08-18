@@ -1,14 +1,14 @@
 import { ConnectionId, ConnectionVariation } from "../../src/Connection";
 import { EmptyGenomeError, FullyConnectedError, Genome, NoConnectionError, UnknownConnectionError, UnknownNodeError } from "../../src/Genome";
-import { InnovationTracker } from "../../src/Innovation";
+import { Innovation } from "../../src/Innovation";
 import { NodeVariation } from "../../src/Node";
 
 test("Genome should throw an error when trying to add a connection to a fully connected network", () => {
     const inputs = 2;
     const outputs = 1;
-    InnovationTracker.init(inputs, outputs);
+    Innovation.init(inputs, outputs);
     const genome = new Genome(
-        InnovationTracker.nodes.map(n => new NodeVariation(n.id, n.type, 1))
+        Innovation.nodes.map(n => new NodeVariation(n.id, 1))
     );
 
     expect(() => genome.addConnection()).not.toThrow(FullyConnectedError);
@@ -19,11 +19,11 @@ test("Genome should throw an error when trying to add a connection to a fully co
 test("Genome should not link a hidden node to itself", () => {
     const inputs = 2;
     const outputs = 1;
-    InnovationTracker.init(inputs, outputs);
-    InnovationTracker.createHiddenNode();
+    Innovation.init(inputs, outputs);
+    Innovation.createHiddenNode();
 
     const genome = new Genome(
-        InnovationTracker.nodes.map(n => new NodeVariation(n.id, n.type, 1)),
+        Innovation.nodes.map(n => new NodeVariation(n.id, 1)),
         [ // Fully connected
             new ConnectionVariation(new ConnectionId(1, 3), 1, false),
             new ConnectionVariation(new ConnectionId(1, 4), 1),
@@ -64,9 +64,9 @@ test("Genome should throw an error when trying to shift an unknown connection we
     const outputs = 1;
     const connectionId = new ConnectionId(1, 3);
     const weight = 1;
-    InnovationTracker.init(inputs, outputs);
+    Innovation.init(inputs, outputs);
     const genome = new Genome(
-        InnovationTracker.nodes.map(n => new NodeVariation(n.id, n.type, 1)),
+        Innovation.nodes.map(n => new NodeVariation(n.id, 1)),
         [ new ConnectionVariation(connectionId, weight) ]
     );
 

@@ -1,2 +1,2 @@
 export * from "./errors";
-export { InnovationTracker } from "./InnovationTracker";
+export { Innovation } from "./Innovation";

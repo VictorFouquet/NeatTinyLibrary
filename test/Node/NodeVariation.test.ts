@@ -1,8 +1,10 @@
+import { Innovation } from "../../src/Innovation";
 import { NodeTypeEnum, NodeVariation } from "../../src/Node";
 
 
 test("A variation node should make a deep copy of itself", () => {
-    const nodeA = new NodeVariation(0, NodeTypeEnum.Hidden, 0.0);
+    Innovation.init(1,1);
+    const nodeA = new NodeVariation(1, 0.0);
     const nodeB = nodeA.copy();
 
     expect(nodeA === nodeA).toStrictEqual(true);
@@ -11,8 +13,9 @@ test("A variation node should make a deep copy of itself", () => {
 });
 
 test("A variation node should mutate its deep copy bias", () => {
+    Innovation.init(1,1);
     const initialBias = 1;
-    const nodeA = new NodeVariation(0, NodeTypeEnum.Hidden, initialBias);
+    const nodeA = new NodeVariation(1, initialBias);
 
     expect(nodeA.bias).toStrictEqual(initialBias);
 

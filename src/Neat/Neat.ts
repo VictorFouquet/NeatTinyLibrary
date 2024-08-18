@@ -1,7 +1,7 @@
 import { ConnectionVariation } from "../Connection";
 import { Genome, IGenome } from "../Genome";
 import { Individual } from "../Individual/Individual";
-import { InnovationTracker } from "../Innovation";
+import { Innovation } from "../Innovation";
 import { NodeVariation } from "../Node";
 import { INeat, INeatConfig } from "./interfaces";
 
@@ -12,16 +12,16 @@ export class Neat implements INeat {
     constructor(config: INeatConfig, fitnessFn: (arg: any) => number) {
         this.config = config;
         this.individuals = [];
-        // When starting the algorithm, all genomes have a fully connected genotype,
+        // When starting the algorithm, all genomes have a fully connected ,
         // linking all input nodes to all output nodes,
         // sharing the same topology but variable biases and weights
         for (let i = 0; i < this.config.populationSize; i++) {
             this.individuals.push(new Individual(
                 new Genome(
-                    InnovationTracker.nodes.map(n => new NodeVariation(
-                        n.id, n.type, Math.random() * 2 - 1
+                    Innovation.nodes.map(n => new NodeVariation(
+                        n.id, Math.random() * 2 - 1
                     )),
-                    InnovationTracker.connections.map(c => new ConnectionVariation(
+                    Innovation.connections.map(c => new ConnectionVariation(
                         c.id, Math.random() * 2 - 1, true
                     ))
                 ),

@@ -1,6 +1,6 @@
 import { ConnectionId, ConnectionVariation } from "../../src/Connection";
 import { Genome } from "../../src/Genome";
-import { InnovationTracker } from "../../src/Innovation";
+import { Innovation } from "../../src/Innovation";
 import { NodeVariation } from "../../src/Node";
 
 test("Empty genome should not contain any node or connections", () => {
@@ -13,10 +13,10 @@ test("Empty genome should not contain any node or connections", () => {
 test("Genome should detect when its network is fully connected", () => {
     const inputs = 2;
     const outputs = 1;
-    InnovationTracker.init(inputs, outputs);
+    Innovation.init(inputs, outputs);
 
     const genomeA = new Genome(
-        InnovationTracker.nodes.map(n => new NodeVariation(n.id, n.type, 1)),
+        Innovation.nodes.map(n => new NodeVariation(n.id, 1)),
         [
             new ConnectionVariation(new ConnectionId(1, 3), 0),
             new ConnectionVariation(new ConnectionId(2, 3), 0)
@@ -25,7 +25,7 @@ test("Genome should detect when its network is fully connected", () => {
     expect(genomeA.isFullyConnected()).toBe(true);
 
     const genomeB = new Genome(
-        InnovationTracker.nodes.map(n => new NodeVariation(n.id, n.type, 1))
+        Innovation.nodes.map(n => new NodeVariation(n.id, 1))
     );
     expect(genomeB.isFullyConnected()).toBe(false);
 });

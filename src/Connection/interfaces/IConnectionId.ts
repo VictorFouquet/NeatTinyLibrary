@@ -3,4 +3,5 @@ export interface IConnectionId {
     out: number;
 
     equals(other: IConnectionId): boolean;
+    toString(): string;
 }

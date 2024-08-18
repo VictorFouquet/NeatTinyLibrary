@@ -1,9 +1,9 @@
-import { InnovationTracker } from "../../src/Innovation"
+import { Innovation } from "../../src/Innovation"
 import { Neat } from "../../src/Neat";
 import { NeatConfig } from "../../src/Neat/NeatConfig";
 
 test("Neat should mutate a genome bias", () => {
-    InnovationTracker.init(1, 1);
+    Innovation.init(1, 1);
     const config = new NeatConfig();
     config.populationSize = 1;
     const neat = new Neat(new NeatConfig(), () => 1);
@@ -20,7 +20,7 @@ test("Neat should mutate a genome bias", () => {
 });
 
 test("Neat should reset a genome connection weight", () => {
-    InnovationTracker.init(1, 1);
+    Innovation.init(1, 1);
     const config = new NeatConfig();
     config.populationSize = 1;
     const neat = new Neat(new NeatConfig(), () => 1);
@@ -36,7 +36,7 @@ test("Neat should reset a genome connection weight", () => {
 });
 
 test("Neat should shift a genome connection weight", () => {
-    InnovationTracker.init(1, 1);
+    Innovation.init(1, 1);
     const config = new NeatConfig();
     config.populationSize = 1;
     const neat = new Neat(new NeatConfig(), () => 1);
@@ -52,7 +52,7 @@ test("Neat should shift a genome connection weight", () => {
 });
 
 test("Neat should disable a genome connection", () => {
-    InnovationTracker.init(1, 1);
+    Innovation.init(1, 1);
     const config = new NeatConfig();
     config.populationSize = 1;
     const neat = new Neat(new NeatConfig(), () => 1);
@@ -68,7 +68,7 @@ test("Neat should disable a genome connection", () => {
 });
 
 test("Neat should add a connection to a genome", () => {
-    InnovationTracker.init(2, 1);
+    Innovation.init(2, 1);
     const config = new NeatConfig();
     config.populationSize = 1;
     const neat = new Neat(new NeatConfig(), () => 1);
@@ -85,7 +85,7 @@ test("Neat should add a connection to a genome", () => {
 });
 
 test("Neat should add a node to a genome", () => {
-    InnovationTracker.init(1, 1);
+    Innovation.init(1, 1);
     const config = new NeatConfig();
     config.populationSize = 1;
     const neat = new Neat(new NeatConfig(), () => 1);

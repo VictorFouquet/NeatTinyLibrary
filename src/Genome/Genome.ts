@@ -2,7 +2,7 @@ import { EmptyGenomeError, NoConnectionError, FullyConnectedError, UnknownConnec
 import { IGenome } from "./interfaces";
 
 import { ConnectionId, ConnectionVariation, IConnectionId, IConnectionVariation } from "../Connection";
-import { InnovationTracker } from "../Innovation";
+import { Innovation } from "../Innovation";
 import { INodeVariation, NodeVariation } from "../Node";
 
 export class Genome implements IGenome {
@@ -89,8 +89,8 @@ export class Genome implements IGenome {
         }
 
         // Creates the connection reference if needed
-        if (!InnovationTracker.connectionExists(connectionId)) {
-            InnovationTracker.createConnection(connectionId.in, connectionId.out);
+        if (!Innovation.connectionExists(connectionId)) {
+            Innovation.createConnection(connectionId.in, connectionId.out);
         }
         const connection = new ConnectionVariation(connectionId, 1, true);
         this.connections.push(connection);
@@ -144,14 +144,14 @@ export class Genome implements IGenome {
         const connection = this.getRandomConnection();
         connection.enabled = false;
         
-        const node = InnovationTracker.createHiddenNode();
+        const node = Innovation.createHiddenNode();
         
-        const variationNode = new NodeVariation(node.id, node.type, Math.random());
+        const variationNode = new NodeVariation(node.id, Math.random());
         this.nodes.push(variationNode);
 
         this.connections.push(
             new ConnectionVariation(
-                InnovationTracker.getOrCreateConnection(
+                Innovation.getOrCreateConnection(
                     new ConnectionId(connection.in, node.id)
                 ).id,
                 1
@@ -160,7 +160,7 @@ export class Genome implements IGenome {
 
         this.connections.push(
             new ConnectionVariation(
-                InnovationTracker.getOrCreateConnection(
+                Innovation.getOrCreateConnection(
                     new ConnectionId(node.id, connection.out)
                 ).id,
                 connection.weight

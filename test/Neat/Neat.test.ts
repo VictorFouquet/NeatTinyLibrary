@@ -1,10 +1,10 @@
-import { InnovationTracker } from "../../src/Innovation"
+import { Innovation } from "../../src/Innovation"
 import { Neat } from "../../src/Neat";
 import { NeatConfig } from "../../src/Neat/NeatConfig";
 
 test("Neat should create a Genome population with the same topology", () => {
     const genomeCount = 3;
-    InnovationTracker.init(2, 1);
+    Innovation.init(2, 1);
     const neat = new Neat(new NeatConfig(), () => 1);
 
     for (let individual of neat.individuals) {

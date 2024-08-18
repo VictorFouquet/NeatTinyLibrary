@@ -1,12 +1,11 @@
 import { Connection } from "./Connection";
-import { ConnectionId } from "./ConnectionId";
-import { IConnectionVariation } from "./interfaces";
+import { IConnectionId, IConnectionVariation } from "./interfaces";
 
 export class ConnectionVariation extends Connection implements IConnectionVariation {
     weight:  number;
     enabled: boolean;
 
-    constructor(id: ConnectionId, weight: number, enabled: boolean = true) {
+    constructor(id: IConnectionId, weight: number, enabled: boolean = true) {
         super(id);
         this.weight  = weight;
         this.enabled = enabled;
