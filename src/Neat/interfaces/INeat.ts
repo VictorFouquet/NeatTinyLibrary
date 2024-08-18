@@ -1,8 +1,8 @@
-import { IGenome } from "../../Genome";
+import { Individual } from "../../Individual/Individual";
 import { INeatConfig } from "./INeatConfig";
 
 export interface INeat {
-    genomes: IGenome[];
+    individuals: Individual[];
     config: INeatConfig;
 
     crossOver(): void;

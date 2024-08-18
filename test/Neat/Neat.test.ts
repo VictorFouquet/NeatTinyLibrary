@@ -7,7 +7,8 @@ test("Neat should create a Genome population with the same topology", () => {
     InnovationTracker.init(2, 1);
     const neat = new Neat(new NeatConfig());
 
-    for (let genome of neat.genomes) {
+    for (let individual of neat.individuals) {
+        const genome = individual.genome;
         expect(genome.connections).toHaveLength(2);
         expect(genome.connections[0].in).toBe(1);
         expect(genome.connections[0].out).toBe(3);

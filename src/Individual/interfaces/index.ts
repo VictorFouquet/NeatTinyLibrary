@@ -1,0 +1,1 @@
+export { IIndividual } from "./IIndividual";
