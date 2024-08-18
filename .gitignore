@@ -1,6 +1,5 @@
 .env
 .env.dev
-.env.test
 dist/**
 node_modules/**
 coverage/**
