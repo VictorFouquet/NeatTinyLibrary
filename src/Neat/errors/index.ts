@@ -1,0 +1,1 @@
+export { MissingConfigError } from "./MissingConfigError";
