@@ -12,21 +12,21 @@ test("Two variation nodes should be equal if they share the same id", () => {
 
 test("An input node should only return true to isInput call", () => {
     const node = new Node(0, NodeTypeEnum.Input);
-    expect(node.isInput()).toStrictEqual(true);
-    expect(node.isHidden()).toStrictEqual(false);
-    expect(node.isOutput()).toStrictEqual(false);
+    expect(node.isInput).toStrictEqual(true);
+    expect(node.isHidden).toStrictEqual(false);
+    expect(node.isOutput).toStrictEqual(false);
 });
 
 test("A hidden node should only return true to isHidden call", () => {
     const node = new Node(0, NodeTypeEnum.Hidden);
-    expect(node.isInput()).toStrictEqual(false);
-    expect(node.isHidden()).toStrictEqual(true);
-    expect(node.isOutput()).toStrictEqual(false);
+    expect(node.isInput).toStrictEqual(false);
+    expect(node.isHidden).toStrictEqual(true);
+    expect(node.isOutput).toStrictEqual(false);
 });
 
 test("An output node should only return true to isOutput call", () => {
     const node = new Node(0, NodeTypeEnum.Output);
-    expect(node.isInput()).toStrictEqual(false);
-    expect(node.isHidden()).toStrictEqual(false);
-    expect(node.isOutput()).toStrictEqual(true);
+    expect(node.isInput).toStrictEqual(false);
+    expect(node.isHidden).toStrictEqual(false);
+    expect(node.isOutput).toStrictEqual(true);
 });
