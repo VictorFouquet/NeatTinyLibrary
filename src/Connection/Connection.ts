@@ -1,14 +1,16 @@
 import { IConnection, IConnectionId } from "./interfaces";
 
 export class Connection implements IConnection {
-    id:  IConnectionId;
-    in:  number;
-    out: number;
+    readonly id:       IConnectionId;
+    readonly in:       number;
+    readonly out:      number;
+    readonly globalId: number;
 
-    constructor(id: IConnectionId) {
+    constructor(id: IConnectionId, globalId: number) {
         this.id  = id;
         this.in  = id.in;
         this.out = id.out;
+        this.globalId = globalId
     }
 
     equals(other: IConnection): boolean {

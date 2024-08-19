@@ -125,7 +125,7 @@ class InnovationBuilder {
     static CreateNode(nodeType: NodeTypeEnum): INode {
         const nodeId = InnovationIdBuilder.Node();
         InnovationBuilder._nodesCount++;
-        InnovationBuilder._nodes[nodeId] = new Node(nodeId, InnovationIdBuilder.NodeGlobal(nodeId), nodeType);
+        InnovationBuilder._nodes[nodeId] = new Node(nodeId, InnovationIdBuilder.GlobalId, nodeType);
 
         return InnovationBuilder._nodes[nodeId];
     }
@@ -149,7 +149,7 @@ class InnovationBuilder {
             throw new ConnectionExistError(in_, out);
         }
         InnovationBuilder._connectionsCount++;
-        InnovationBuilder._connections[id] = new Connection(connectionId);
+        InnovationBuilder._connections[id] = new Connection(connectionId, InnovationIdBuilder.GlobalId);
 
         return InnovationBuilder._connections[id];
     }
@@ -182,6 +182,8 @@ class InnovationIdBuilder {
     private static _globalId = 0;
     private static _nodeToGlobal: { [id: number]: number } = {};
     private static _connectionToGlobal: { [id: string]: number } = {};
+
+    static get GlobalId(): number { return InnovationIdBuilder._globalId; };
 
     static Node(): number {
         InnovationIdBuilder._nodeId++;

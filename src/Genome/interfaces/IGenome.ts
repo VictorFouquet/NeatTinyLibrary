@@ -6,6 +6,7 @@ export interface IGenome {
     connections: IConnectionVariation[];
 
     distance(other: IGenome): number;
+    crossover(other: IGenome): IGenome;
 
     isFullyConnected(): boolean;
 
@@ -18,6 +19,7 @@ export interface IGenome {
     getConnection(id: IConnectionId):               IConnectionVariation|null;
     getRandomConnection():                          IConnectionVariation;
     addConnection():                                IConnectionVariation;
+    alignedConnections():                           IConnectionVariation[];
     mutateConnectionWeight(id: IConnectionId):      IConnectionVariation;
     mutateConnectionWeightShift(id: IConnectionId): IConnectionVariation
     mutateConnectionEnabled(id: IConnectionId):     IConnectionVariation;

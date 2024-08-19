@@ -1,3 +1,4 @@
+import { Innovation } from "../Innovation";
 import { Connection } from "./Connection";
 import { IConnectionId, IConnectionVariation } from "./interfaces";
 
@@ -6,7 +7,7 @@ export class ConnectionVariation extends Connection implements IConnectionVariat
     enabled: boolean;
 
     constructor(id: IConnectionId, weight: number, enabled: boolean = true) {
-        super(id);
+        super(id, Innovation.getConnection(id).globalId);
         this.weight  = weight;
         this.enabled = enabled;
     }

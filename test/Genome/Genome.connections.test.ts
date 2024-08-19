@@ -104,3 +104,73 @@ test("Genome should trigger the creation of a new connection in the Innovation",
     expect(Innovation.connections).toHaveLength(5);
     expect(Innovation.connectionsCount).toBe(5);
 });
+
+test("Genome should get a copy of its connections sorted by global innovation id", () => {
+    const inputs = 2;
+    const outputs = 1;
+
+    Innovation.init(inputs, outputs); // N: 1, 2, 3 - C: 4, 5,
+
+    const genome = new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, 1)),
+        [
+            new ConnectionVariation(new ConnectionId(1, 3), 1), // C: 4
+            new ConnectionVariation(new ConnectionId(2, 3), 1)  // C: 5
+        ]
+    );
+
+    genome.addNode() // N: 6 - C: 7, 8
+
+    const sorted = genome.alignedConnections();
+
+    expect(sorted.map(c => c.globalId)).toEqual([4, 5, 7, 8])
+});
+
+test("Genome should randomly crossover its joint connections", () => {
+    const inputs = 2;
+    const outputs = 1;
+
+    Innovation.init(inputs, outputs);
+
+    Innovation.createHiddenNode();
+    Innovation.createHiddenNode();
+    // Link to/from hidden node
+    Innovation.createConnection(1, 4);
+    Innovation.createConnection(2, 4);
+    Innovation.createConnection(1, 5);
+    Innovation.createConnection(2, 5);
+    Innovation.createConnection(4, 3);
+    Innovation.createConnection(4, 5);
+    Innovation.createConnection(5, 3);
+
+    // Weight 0, enabled
+    const parent1 = new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, 1)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, 0, true))
+    );
+    // Weight 1, disabled
+    const parent2 = new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, 1)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, 1, false))
+    );
+
+    const child = parent1.crossover(parent2);
+
+    // Child has herited gene from parent1 xor from parent2
+    expect(child.connections.every((c, i) => (
+        +(
+            c.weight === parent1.connections[i].weight &&
+            c.enabled === parent1.connections[i].enabled
+        )
+        ^+(
+            c.weight === parent2.connections[i].weight &&
+            c.enabled === parent2.connections[i].enabled
+        )
+    ))).toBe(true);
+
+    // Child has not herited all its gene from one parent
+    expect(
+        child.connections.every(c => c.enabled) || 
+        child.connections.every(c => !c.enabled)
+    ).toBe(false);
+});

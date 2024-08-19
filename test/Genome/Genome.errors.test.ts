@@ -17,21 +17,18 @@ test("Genome should throw an error when trying to add a connection to a fully co
 });
 
 test("Genome should not link a hidden node to itself", () => {
-    const inputs = 2;
-    const outputs = 1;
-    Innovation.init(inputs, outputs);
-    Innovation.createHiddenNode();
+    const inputs = 2; // 1, 2
+    const outputs = 1; // 3
+    Innovation.init(inputs, outputs); // 4, 5
+    Innovation.createHiddenNode(); // 6
 
     const genome = new Genome(
         Innovation.nodes.map(n => new NodeVariation(n.id, 1)),
         [ // Fully connected
-            new ConnectionVariation(new ConnectionId(1, 3), 1, false),
-            new ConnectionVariation(new ConnectionId(1, 4), 1),
-            
-            new ConnectionVariation(new ConnectionId(2, 3), 1, false),
-            new ConnectionVariation(new ConnectionId(2, 4), 1),
-
-            new ConnectionVariation(new ConnectionId(4, 3), 1),
+            ...Innovation.connections.map(c => new ConnectionVariation(c.id, 0.0, true)),
+            new ConnectionVariation(Innovation.createConnection(1, 4).id, 1),
+            new ConnectionVariation(Innovation.createConnection(2, 4).id, 1),
+            new ConnectionVariation(Innovation.createConnection(4, 3).id, 1),
         ]
     );
     expect(genome.isFullyConnected()).toBe(true);

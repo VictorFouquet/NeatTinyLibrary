@@ -60,6 +60,61 @@ export class Genome implements IGenome {
         throw "Distance not implemented";
     }
 
+    crossover(other: IGenome): IGenome {
+        const childConns = this.crossoverConnections(other);
+
+        return new Genome(this.getNodesFromConnections(childConns), childConns);
+    }
+
+    private crossoverConnections(other: IGenome): IConnectionVariation[] {
+        const childConns: IConnectionVariation[] = [];
+        const parent1Conns = this.alignedConnections();
+        const parent2Conns = other.alignedConnections();
+
+        let idx1 = 0;
+        let idx2 = 0;
+
+        while(idx1 < parent1Conns.length && idx2 < parent2Conns.length) {            
+            if (parent1Conns[idx1].globalId === parent2Conns[idx2].globalId) {
+                childConns.push(Math.random() > 0.5 ? parent1Conns[idx1] : parent2Conns[idx2]);
+                idx1++;
+                idx2++;
+            } else if (parent1Conns[idx1].globalId > parent2Conns[idx2].globalId) {
+                idx2++;
+            } else {
+                childConns.push(parent1Conns[idx1]);
+                idx1++;
+            }
+        }
+
+        if (idx1 < parent1Conns.length) {
+            childConns.push(...parent1Conns.splice(idx1));
+        }
+
+        return childConns;
+    }
+
+    private getNodesFromConnections(conns: IConnectionVariation[]): INodeVariation[] {
+        const nodes: INodeVariation[] = [];
+        const nodesIds = new Set<number>();
+
+        for (let conn of conns) {
+            const nodeInId = conn.id.in;
+            const nodeOutId = conn.id.out;
+
+            if (!nodesIds.has(nodeInId)) {
+                nodes.push(this.nodes.filter(n => n.id === nodeInId)[0]);
+                nodesIds.add(nodeInId);
+            }
+            if (!nodesIds.has(nodeOutId)) {
+                nodes.push(this.nodes.filter(n => n.id === nodeOutId)[0]);
+                nodesIds.add(nodeOutId);
+            }
+        }
+
+        return nodes;
+    }
+
     addConnection(): IConnectionVariation {
         if (this.isFullyConnected()) {
             throw new FullyConnectedError()
@@ -101,6 +156,10 @@ export class Genome implements IGenome {
     getConnection(id: IConnectionId): IConnectionVariation|null {
         const connectionsFiltered = this.connections.filter(c => c.id.equals(id));
         return connectionsFiltered.length === 1 ? connectionsFiltered[0] : null;
+    }
+
+    alignedConnections(): IConnectionVariation[] {
+        return this.connections.sort((a,b) => a.globalId - b.globalId).map(c => c.copy());
     }
 
     mutateConnectionWeight(id: IConnectionId): IConnectionVariation {
