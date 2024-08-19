@@ -6,16 +6,16 @@ import { Innovation } from "../Innovation";
 import { INodeVariation, NodeVariation } from "../Node";
 
 export class Genome implements IGenome {
+    static empty(): IGenome {
+        return new Genome([]);
+    }
+
     nodes: INodeVariation[];
     connections: IConnectionVariation[];
 
     constructor(nodes: INodeVariation[], connections: IConnectionVariation[] = []) {
         this.nodes = nodes;
         this.connections = connections;
-    }
-
-    static empty(): IGenome {
-        return new Genome([]);
     }
 
     /**
@@ -34,26 +34,6 @@ export class Genome implements IGenome {
             }
         }
         return true;
-    }
-
-    getInputNodes(): INodeVariation[] {
-        return this.nodes.filter(n => n.isInput);
-    }
-
-    getHiddenNodes(): INodeVariation[] {
-        return this.nodes.filter(n => n.isHidden);
-    }
-
-    getOutputNodes(): INodeVariation[] {
-        return this.nodes.filter(n => n.isOutput);
-    }
-
-    filterInputNodes(): INodeVariation[] {
-        return this.nodes.filter(n => !n.isInput);
-    }
-
-    filterOutputNodes(): INodeVariation[] {
-        return this.nodes.filter(n => !n.isOutput);
     }
 
     distance(other: IGenome): number {
@@ -94,27 +74,6 @@ export class Genome implements IGenome {
         return childConns;
     }
 
-    private getNodesFromConnections(conns: IConnectionVariation[]): INodeVariation[] {
-        const nodes: INodeVariation[] = [];
-        const nodesIds = new Set<number>();
-
-        for (let conn of conns) {
-            const nodeInId = conn.id.in;
-            const nodeOutId = conn.id.out;
-
-            if (!nodesIds.has(nodeInId)) {
-                nodes.push(this.nodes.filter(n => n.id === nodeInId)[0]);
-                nodesIds.add(nodeInId);
-            }
-            if (!nodesIds.has(nodeOutId)) {
-                nodes.push(this.nodes.filter(n => n.id === nodeOutId)[0]);
-                nodesIds.add(nodeOutId);
-            }
-        }
-
-        return nodes;
-    }
-
     addConnection(): IConnectionVariation {
         if (this.isFullyConnected()) {
             throw new FullyConnectedError()
@@ -153,52 +112,6 @@ export class Genome implements IGenome {
         return connection;
     }
 
-    getConnection(id: IConnectionId): IConnectionVariation|null {
-        const connectionsFiltered = this.connections.filter(c => c.id.equals(id));
-        return connectionsFiltered.length === 1 ? connectionsFiltered[0] : null;
-    }
-
-    alignedConnections(): IConnectionVariation[] {
-        return this.connections.sort((a,b) => a.globalId - b.globalId).map(c => c.copy());
-    }
-
-    mutateConnectionWeight(id: IConnectionId): IConnectionVariation {
-        const connection = this.getConnection(id);
-        if (connection === null)
-            throw new UnknownConnectionError(id.in, id.out);
-
-        connection.mutateWeight();
-        return connection;
-    }
-
-    mutateConnectionWeightShift(id: IConnectionId): IConnectionVariation {
-        const connection = this.getConnection(id);
-        if (connection === null)
-            throw new UnknownConnectionError(id.in, id.out);
-        connection.shiftWeight();
-        return connection;
-    }
-
-    mutateConnectionEnabled(id: IConnectionId): IConnectionVariation {
-        const connection = this.getConnection(id);
-        if (connection === null)
-            throw new UnknownConnectionError(id.in, id.out);
-
-        connection.mutateEnabled();
-        return connection;
-    }
-
-    containsConnection(id: IConnectionId): boolean {
-        return this.getConnection(id) !== null;
-    }
-
-    getRandomConnection(): IConnectionVariation {
-        if (this.connections.length === 0) {
-            throw new NoConnectionError();
-        }
-        return this.connections[Math.floor(Math.random() * this.connections.length)];
-    }
-
     addNode(): INodeVariation {
         const connection = this.getRandomConnection();
         connection.enabled = false;
@@ -229,21 +142,30 @@ export class Genome implements IGenome {
         return variationNode;
     }
 
-    getNode(id: number): INodeVariation {
-        if (!this.containsNode(id))
-            throw new UnknownNodeError(id);
-        return this.getNodeInternal(id)!;
+    mutateConnectionWeight(id: IConnectionId): IConnectionVariation {
+        const connection = this.getConnection(id);
+        if (connection === null)
+            throw new UnknownConnectionError(id.in, id.out);
+
+        connection.mutateWeight();
+        return connection;
     }
 
-    private getNodeInternal(id: number): INodeVariation|null {
-        const node = this.nodes.filter(n => n.id === id);
-        return node.length === 1 ? node[0] : null;
+    mutateConnectionWeightShift(id: IConnectionId): IConnectionVariation {
+        const connection = this.getConnection(id);
+        if (connection === null)
+            throw new UnknownConnectionError(id.in, id.out);
+        connection.shiftWeight();
+        return connection;
     }
 
-    getRandomNode(): INodeVariation {
-        if (this.nodes.length === 0)
-            throw new EmptyGenomeError();
-        return this.nodes[Math.floor(Math.random() * this.nodes.length)];
+    mutateConnectionEnabled(id: IConnectionId): IConnectionVariation {
+        const connection = this.getConnection(id);
+        if (connection === null)
+            throw new UnknownConnectionError(id.in, id.out);
+
+        connection.mutateEnabled();
+        return connection;
     }
 
     mutateNodeBias(id: number): INodeVariation {
@@ -252,13 +174,79 @@ export class Genome implements IGenome {
         return node;
     }
 
+    containsConnection(id: IConnectionId): boolean {
+        return this.getConnection(id) !== null;
+    }
+    
+    getConnection(id: IConnectionId): IConnectionVariation|null {
+        const connectionsFiltered = this.connections.filter(c => c.id.equals(id));
+        return connectionsFiltered.length === 1 ? connectionsFiltered[0] : null;
+    }
+
+    getRandomConnection(): IConnectionVariation {
+        if (this.connections.length === 0) {
+            throw new NoConnectionError();
+        }
+        return this.connections[Math.floor(Math.random() * this.connections.length)];
+    }
+
+    alignedConnections(): IConnectionVariation[] {
+        return this.connections.sort((a,b) => a.globalId - b.globalId).map(c => c.copy());
+    }
+
+    getInputNodes(): INodeVariation[] { return this.nodes.filter(n => n.isInput); }
+
+    getHiddenNodes(): INodeVariation[] { return this.nodes.filter(n => n.isHidden); }
+
+    getOutputNodes(): INodeVariation[] { return this.nodes.filter(n => n.isOutput); }
+
+    filterInputNodes(): INodeVariation[] { return this.nodes.filter(n => !n.isInput); }
+
+    filterOutputNodes(): INodeVariation[] { return this.nodes.filter(n => !n.isOutput); }
+
+    containsNode(id: number): boolean { return this.getNodeInternal(id) !== null; }
+
+    getNode(id: number): INodeVariation {
+        if (!this.containsNode(id))
+            throw new UnknownNodeError(id);
+        return this.getNodeInternal(id)!;
+    }
+
+    getRandomNode(): INodeVariation {
+        if (this.nodes.length === 0)
+            throw new EmptyGenomeError();
+        return this.nodes[Math.floor(Math.random() * this.nodes.length)];
+    }
+
     removeNode(id: number): INodeVariation {
         const node = this.getNode(id);
         this.nodes.splice(this.nodes.indexOf(node), 1);
         return node;
     }
 
-    containsNode(id: number): boolean {
-        return this.getNodeInternal(id) !== null;
+    private getNodeInternal(id: number): INodeVariation|null {
+        const node = this.nodes.filter(n => n.id === id);
+        return node.length === 1 ? node[0] : null;
+    }
+
+    private getNodesFromConnections(conns: IConnectionVariation[]): INodeVariation[] {
+        const nodes: INodeVariation[] = [];
+        const nodesIds = new Set<number>();
+
+        for (let conn of conns) {
+            const nodeInId = conn.id.in;
+            const nodeOutId = conn.id.out;
+
+            if (!nodesIds.has(nodeInId)) {
+                nodes.push(this.nodes.filter(n => n.id === nodeInId)[0]);
+                nodesIds.add(nodeInId);
+            }
+            if (!nodesIds.has(nodeOutId)) {
+                nodes.push(this.nodes.filter(n => n.id === nodeOutId)[0]);
+                nodesIds.add(nodeOutId);
+            }
+        }
+
+        return nodes;
     }
 }
