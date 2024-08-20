@@ -37,42 +37,42 @@ export class NeatConfig implements INeatConfig {
                 ? Config[env]
                 : Config["default"];
 
-        if (!("populationSize" in config))
+        if (config.populationSize === undefined)
             throw new MissingConfigError("populationSize", env);
         else
             this.populationSize = config.populationSize;
 
-        if (!("mutationThreshold" in config))
+        if (config.mutationThreshold === undefined)
             throw new MissingConfigError("mutationThreshold", env);
         else
             this.mutationThreshold = config.mutationThreshold;
 
-        if (!("resetWeightThreshold" in config))
+        if (config.resetWeightThreshold === undefined)
             throw new MissingConfigError("resetWeightThreshold", env);
         else
             this.resetWeightThreshold = config.resetWeightThreshold;
 
-        if (!("shiftWeightThreshold" in config))
+        if (config.shiftWeightThreshold === undefined)
             throw new MissingConfigError("shiftWeightThreshold", env);
         else
             this.shiftWeightThreshold = config.shiftWeightThreshold;
 
-        if (!("resetEnabledThreshold" in config))
+        if (config.resetEnabledThreshold === undefined)
             throw new MissingConfigError("resetEnabledThreshold", env);
         else
             this.resetEnabledThreshold = config.resetEnabledThreshold;
 
-        if (!("addConnectionThreshold" in config))
+        if (config.addConnectionThreshold === undefined)
             throw new MissingConfigError("addConnectionThreshold", env);
         else
             this.addConnectionThreshold = config.addConnectionThreshold;
 
-        if (!("addNodeThreshold" in config))
+        if (config.addNodeThreshold === undefined)
             throw new MissingConfigError("ADD_NODE_THRESHOLD", env);
         else
             this.addNodeThreshold = config.addNodeThreshold;
 
-        if (!("resetBiasThreshold" in config))
+        if (config.resetBiasThreshold === undefined)
             throw new MissingConfigError("resetBiasThreshold", env);
         else
             this.resetBiasThreshold = config.resetBiasThreshold;
