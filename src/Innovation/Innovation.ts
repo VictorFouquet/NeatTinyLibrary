@@ -205,7 +205,7 @@ class InnovationIdBuilder {
 
     static Connection(in_: number, out: number): ConnectionId {
         const connectionId = new ConnectionId(in_, out);
-        if (InnovationIdBuilder._connectionToGlobal[connectionId.toString()] !== undefined) {
+        if (InnovationIdBuilder._connectionToGlobal[connectionId.toString()] === undefined) {
             InnovationIdBuilder._globalId++;
             InnovationIdBuilder._connectionToGlobal[connectionId.toString()] = InnovationIdBuilder._globalId;
         }
