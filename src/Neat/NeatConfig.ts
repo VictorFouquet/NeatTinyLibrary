@@ -12,6 +12,9 @@ export class NeatConfig implements INeatConfig {
     addConnectionThreshold: number;
     addNodeThreshold:       number;
     resetBiasThreshold:     number;
+    c1: number;
+    c2: number;
+    c3: number;
 
     constructor() {
         dotenvFlow.config();
@@ -55,5 +58,9 @@ export class NeatConfig implements INeatConfig {
             throw new MissingConfigError("RESET_BIAS_THRESHOLD")
         else
             this.resetBiasThreshold = +process.env.RESET_BIAS_THRESHOLD;
+
+        this.c1 = process.env.C1 === undefined ? 1 : +process.env.C1;
+        this.c2 = process.env.C2 === undefined ? 1 : +process.env.C2;
+        this.c3 = process.env.C3 === undefined ? 1 : +process.env.C3;
     }
 }
