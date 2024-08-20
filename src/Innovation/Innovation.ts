@@ -131,7 +131,7 @@ class InnovationBuilder {
     }
 
     static NodeExist(id: number): boolean {
-        return id in InnovationBuilder._nodes;
+        return InnovationBuilder._nodes[id] !== undefined;
     }
 
     static GetNode(id: number): INode {
@@ -156,7 +156,7 @@ class InnovationBuilder {
 
     static ConnectionExist(id: IConnectionId): boolean {
         if (InnovationIdBuilder.ConnectionExists(id))
-            return InnovationIdBuilder.ConnectionGlobal(id) in InnovationBuilder._connections;
+            return  InnovationBuilder._connections[InnovationIdBuilder.ConnectionGlobal(id)] !== undefined;
         return false;
     }
 
@@ -197,7 +197,7 @@ class InnovationIdBuilder {
     }
 
     static NodeGlobal(id: number) {
-        if (!(id in InnovationIdBuilder._nodeToGlobal)) {
+        if (InnovationIdBuilder._nodeToGlobal[id] === undefined) {
             throw new UnknownNodeError(id);
         }
         return InnovationIdBuilder._nodeToGlobal[id];
@@ -205,7 +205,7 @@ class InnovationIdBuilder {
 
     static Connection(in_: number, out: number): ConnectionId {
         const connectionId = new ConnectionId(in_, out);
-        if (!(connectionId.toString() in InnovationIdBuilder._connectionToGlobal)) {
+        if (InnovationIdBuilder._connectionToGlobal[connectionId.toString()] === undefined) {
             InnovationIdBuilder._globalId++;
             InnovationIdBuilder._connectionToGlobal[connectionId.toString()] = InnovationIdBuilder._globalId;
         }
@@ -220,7 +220,7 @@ class InnovationIdBuilder {
     }
 
     static ConnectionExists(id: IConnectionId): boolean {
-        return id.toString() in InnovationIdBuilder._connectionToGlobal;
+        return InnovationIdBuilder._connectionToGlobal[id.toString()] !== undefined;
     }
 
     static Clear(): void {
