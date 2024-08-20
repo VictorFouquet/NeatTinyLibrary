@@ -1,5 +1,5 @@
 import { ConnectionVariation } from "../Connection";
-import { Genome, IGenome } from "../Genome";
+import { Genome } from "../Genome";
 import { Individual } from "../Individual/Individual";
 import { Innovation } from "../Innovation";
 import { NodeVariation } from "../Node";
@@ -7,7 +7,7 @@ import { INeat, INeatConfig } from "./interfaces";
 import { NeatConfig } from "./NeatConfig";
 
 export class Neat implements INeat {
-    private static _config:  INeatConfig = new NeatConfig();
+    private static _config:  INeatConfig = NeatConfig.GetInstance();
 
     individuals: Individual[];
 
@@ -56,7 +56,7 @@ export class Neat implements INeat {
                 continue;
             }
 
-            sum += Neat.config.resetWeighThreshold;
+            sum += Neat.config.resetWeightThreshold;
             if (rand < sum && genome.connections.length > 0) {
                 genome.mutateConnectionWeight(genome.getRandomConnection().id);
                 continue;

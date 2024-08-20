@@ -1,0 +1,17 @@
+{
+    "populationSize":    5,
+
+    "mutationThreshold": 0.2,
+
+    "resetBiasThreshold":    0.175,
+    "resetWeightThreshold":  0.175,
+    "shiftWeightThreshold":  0.175,
+    "resetEnabledThreshold": 0.175,
+
+    "addConnectionThreshold": 0.2,
+    "addNodeThreshold":       0.1,
+
+    "c1": 1,
+    "c2": 1,
+    "c3": 1
+}
