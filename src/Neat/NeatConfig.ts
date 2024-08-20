@@ -1,59 +1,84 @@
-import dotenvFlow from "dotenv-flow";
-
 import { INeatConfig } from "./interfaces";
 import { MissingConfigError } from "./errors";
+import { Config } from "./configs";
 
 export class NeatConfig implements INeatConfig {
-    populationSize:         number;
-    mutationThreshold:      number;
-    resetWeighThreshold:    number;
-    shiftWeightThreshold:   number;
-    resetEnabledThreshold:  number;
-    addConnectionThreshold: number;
-    addNodeThreshold:       number;
-    resetBiasThreshold:     number;
+    private static _instance: NeatConfig;
+    private static _allowedEnvs = ["dev", "default", "prod", "test"];
 
-    constructor() {
-        dotenvFlow.config();
+    private static readonly c1Default = 1;
+    private static readonly c2Default = 1;
+    private static readonly c3Default = 1;
 
-        if (process.env.POPULATION_SIZE === undefined)
-            throw new MissingConfigError("POPULTATION SIZE");
+    static GetInstance(config?: INeatConfig) {
+        if (NeatConfig._instance === undefined) {
+            NeatConfig._instance = new NeatConfig(config);
+        }
+        return NeatConfig._instance;
+    }
+
+    readonly populationSize:         number;
+    readonly mutationThreshold:      number;
+    readonly resetWeightThreshold:   number;
+    readonly shiftWeightThreshold:   number;
+    readonly resetEnabledThreshold:  number;
+    readonly addConnectionThreshold: number;
+    readonly addNodeThreshold:       number;
+    readonly resetBiasThreshold:     number;
+    readonly c1: number;
+    readonly c2: number;
+    readonly c3: number;
+
+    private constructor(config_?: INeatConfig) {
+        const env = process.env.NODE_ENV ?? "default";
+        const config = config_
+            ? config_
+            :  NeatConfig._allowedEnvs.includes(env)
+                ? Config[env]
+                : Config["default"];
+
+        if (!("populationSize" in config))
+            throw new MissingConfigError("populationSize", env);
         else
-            this.populationSize = +process.env.POPULATION_SIZE;
+            this.populationSize = config.populationSize;
 
-        if (process.env.MUTATION_THRESHOLD === undefined)
-            throw new MissingConfigError("MUTATION_THRESHOLD");
+        if (!("mutationThreshold" in config))
+            throw new MissingConfigError("mutationThreshold", env);
         else
-            this.mutationThreshold = +process.env.MUTATION_THRESHOLD;
+            this.mutationThreshold = config.mutationThreshold;
 
-        if (process.env.RESET_WEIGHT_THRESHOLD === undefined)
-            throw new MissingConfigError("RESET_WEIGHT_THRESHOLD")
+        if (!("resetWeightThreshold" in config))
+            throw new MissingConfigError("resetWeightThreshold", env);
         else
-            this.resetWeighThreshold = +process.env.RESET_WEIGHT_THRESHOLD;
+            this.resetWeightThreshold = config.resetWeightThreshold;
 
-        if (process.env.SHIFT_WEIGHT_THRESHOLD === undefined)
-            throw new MissingConfigError("SHIFT_WEIGHT_THRESHOLD")
+        if (!("shiftWeightThreshold" in config))
+            throw new MissingConfigError("shiftWeightThreshold", env);
         else
-            this.shiftWeightThreshold = +process.env.SHIFT_WEIGHT_THRESHOLD;
+            this.shiftWeightThreshold = config.shiftWeightThreshold;
 
-        if (process.env.RESET_ENABLED_THRESHOLD === undefined)
-            throw new MissingConfigError("RESET_ENABLED_THRESHOLD")
+        if (!("resetEnabledThreshold" in config))
+            throw new MissingConfigError("resetEnabledThreshold", env);
         else
-            this.resetEnabledThreshold = +process.env.RESET_ENABLED_THRESHOLD;
+            this.resetEnabledThreshold = config.resetEnabledThreshold;
 
-        if (process.env.ADD_CONNECTION_THRESHOLD === undefined)
-            throw new MissingConfigError("ADD_CONNECTION_THRESHOLD")
+        if (!("addConnectionThreshold" in config))
+            throw new MissingConfigError("addConnectionThreshold", env);
         else
-            this.addConnectionThreshold = +process.env.ADD_CONNECTION_THRESHOLD;
+            this.addConnectionThreshold = config.addConnectionThreshold;
 
-        if (process.env.ADD_NODE_THRESHOLD === undefined)
-            throw new MissingConfigError("ADD_NODE_THRESHOLD")
+        if (!("addNodeThreshold" in config))
+            throw new MissingConfigError("ADD_NODE_THRESHOLD", env);
         else
-            this.addNodeThreshold = +process.env.ADD_NODE_THRESHOLD;
+            this.addNodeThreshold = config.addNodeThreshold;
 
-        if (process.env.RESET_BIAS_THRESHOLD === undefined)
-            throw new MissingConfigError("RESET_BIAS_THRESHOLD")
+        if (!("resetBiasThreshold" in config))
+            throw new MissingConfigError("resetBiasThreshold", env);
         else
-            this.resetBiasThreshold = +process.env.RESET_BIAS_THRESHOLD;
+            this.resetBiasThreshold = config.resetBiasThreshold;
+
+        this.c1 = config.c1 === undefined ? NeatConfig.c1Default : config.c1;
+        this.c2 = config.c2 === undefined ? NeatConfig.c2Default : config.c2;
+        this.c3 = config.c3 === undefined ? NeatConfig.c3Default : config.c3;
     }
 }

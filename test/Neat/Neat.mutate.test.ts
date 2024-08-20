@@ -1,12 +1,15 @@
+import { Config } from "../../src/Neat/configs";
 import { Innovation } from "../../src/Innovation"
 import { Neat } from "../../src/Neat";
 import { NeatConfig } from "../../src/Neat/NeatConfig";
 
+const config = Config.test;
+config.populationSize = 1;
+NeatConfig.GetInstance(config);
+
 test("Neat should mutate a genome bias", () => {
     Innovation.init(1, 1);
-    const config = new NeatConfig();
-    config.populationSize = 1;
-    const neat = new Neat(new NeatConfig(), () => 1);
+    const neat = new Neat(() => 1);
 
     const input = neat.individuals[0].genome.nodes[0];
     const output = neat.individuals[0].genome.nodes[1];
@@ -21,9 +24,7 @@ test("Neat should mutate a genome bias", () => {
 
 test("Neat should reset a genome connection weight", () => {
     Innovation.init(1, 1);
-    const config = new NeatConfig();
-    config.populationSize = 1;
-    const neat = new Neat(new NeatConfig(), () => 1);
+    const neat = new Neat(() => 1);
 
     const connection = neat.individuals[0].genome.connections[0];
     const weight = connection.weight;
@@ -37,9 +38,7 @@ test("Neat should reset a genome connection weight", () => {
 
 test("Neat should shift a genome connection weight", () => {
     Innovation.init(1, 1);
-    const config = new NeatConfig();
-    config.populationSize = 1;
-    const neat = new Neat(new NeatConfig(), () => 1);
+    const neat = new Neat(() => 1);
 
     const connection = neat.individuals[0].genome.connections[0];
     const weight = connection.weight;
@@ -53,9 +52,7 @@ test("Neat should shift a genome connection weight", () => {
 
 test("Neat should disable a genome connection", () => {
     Innovation.init(1, 1);
-    const config = new NeatConfig();
-    config.populationSize = 1;
-    const neat = new Neat(new NeatConfig(), () => 1);
+    const neat = new Neat(() => 1);
 
     const connection = neat.individuals[0].genome.connections[0];
     const weight = connection.weight;
@@ -69,9 +66,7 @@ test("Neat should disable a genome connection", () => {
 
 test("Neat should add a connection to a genome", () => {
     Innovation.init(2, 1);
-    const config = new NeatConfig();
-    config.populationSize = 1;
-    const neat = new Neat(new NeatConfig(), () => 1);
+    const neat = new Neat(() => 1);
 
     expect(neat.individuals[0].genome.connections).toHaveLength(2);
     neat.individuals[0].genome.addNode();
@@ -86,9 +81,7 @@ test("Neat should add a connection to a genome", () => {
 
 test("Neat should add a node to a genome", () => {
     Innovation.init(1, 1);
-    const config = new NeatConfig();
-    config.populationSize = 1;
-    const neat = new Neat(new NeatConfig(), () => 1);
+    const neat = new Neat(() => 1);
 
     expect(neat.individuals[0].genome.nodes).toHaveLength(2);
 

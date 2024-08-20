@@ -1,21 +1,22 @@
 import { ConnectionVariation } from "../Connection";
-import { Genome, IGenome } from "../Genome";
+import { Genome } from "../Genome";
 import { Individual } from "../Individual/Individual";
 import { Innovation } from "../Innovation";
 import { NodeVariation } from "../Node";
 import { INeat, INeatConfig } from "./interfaces";
+import { NeatConfig } from "./NeatConfig";
 
 export class Neat implements INeat {
-    individuals: Individual[];
-    config:  INeatConfig;
+    private static _config:  INeatConfig = NeatConfig.GetInstance();
 
-    constructor(config: INeatConfig, fitnessFn: (arg: any) => number) {
-        this.config = config;
+    individuals: Individual[];
+
+    constructor(fitnessFn: (arg: any) => number) {
         this.individuals = [];
         // When starting the algorithm, all genomes have a fully connected ,
         // linking all input nodes to all output nodes,
         // sharing the same topology but variable biases and weights
-        for (let i = 0; i < this.config.populationSize; i++) {
+        for (let i = 0; i < Neat.config.populationSize; i++) {
             this.individuals.push(new Individual(
                 new Genome(
                     Innovation.nodes.map(n => new NodeVariation(
@@ -30,6 +31,8 @@ export class Neat implements INeat {
         }
     };
 
+    static get config(): INeatConfig { return Neat._config; };
+
     crossOver(): void {
         throw new Error("Method not implemented.");
     }
@@ -37,35 +40,35 @@ export class Neat implements INeat {
     mutate(force: boolean = false, _rand?: number): void {
         for (let individual of this.individuals) {
             const genome = individual.genome;
-            if (force === false && Math.random() < this.config.mutationThreshold) {
+            if (force === false && Math.random() < Neat.config.mutationThreshold) {
                 continue;
             }
             const rand = _rand !== undefined ? _rand : Math.random();
-            let sum = this.config.resetBiasThreshold;
+            let sum = Neat.config.resetBiasThreshold;
             if (rand < sum && genome.nodes.length > 0) {
                 genome.mutateNodeBias(genome.getRandomNode().id);
                 continue;
             }
 
-            sum += this.config.shiftWeightThreshold;
+            sum += Neat.config.shiftWeightThreshold;
             if (rand < sum && genome.connections.length > 0) {
                 genome.mutateConnectionWeightShift(genome.getRandomConnection().id);
                 continue;
             }
 
-            sum += this.config.resetWeighThreshold;
+            sum += Neat.config.resetWeightThreshold;
             if (rand < sum && genome.connections.length > 0) {
                 genome.mutateConnectionWeight(genome.getRandomConnection().id);
                 continue;
             }
 
-            sum += this.config.resetEnabledThreshold;
+            sum += Neat.config.resetEnabledThreshold;
             if (rand < sum && genome.connections.length > 0) {
                 genome.mutateConnectionEnabled(genome.getRandomConnection().id);
                 continue;
             }
 
-            sum += this.config.addConnectionThreshold;
+            sum += Neat.config.addConnectionThreshold;
             if (rand < sum && !genome.isFullyConnected()) {
                 genome.addConnection();
                 continue;

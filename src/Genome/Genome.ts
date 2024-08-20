@@ -4,6 +4,7 @@ import { IGenome } from "./interfaces";
 import { ConnectionId, ConnectionVariation, IConnectionId, IConnectionVariation } from "../Connection";
 import { Innovation } from "../Innovation";
 import { INodeVariation, NodeVariation } from "../Node";
+import { Neat } from "../Neat";
 
 export class Genome implements IGenome {
     static empty(): IGenome {
@@ -37,7 +38,45 @@ export class Genome implements IGenome {
     }
 
     distance(other: IGenome): number {
-        throw "Distance not implemented";
+        const thisHighestInnovNumber  = this.alignedConnections()[this.connections.length-1].globalId;
+        const otherHighestInnovNumber = other.alignedConnections()[other.connections.length-1].globalId;
+        const [indiv1, indiv2] = thisHighestInnovNumber > otherHighestInnovNumber
+            ? [ this, other ]
+            : [ other, this ];
+
+        let idx1 = 0;
+        let idx2 = 0;
+        let disjoint = 0;
+        let excess = 0;
+        let common = 0;
+        let weightDelta = 0;
+
+        while (idx1 < indiv1.connections.length && idx2 < indiv2.connections.length) {
+            const con1 = indiv1.connections[idx1];
+            const con2 = indiv2.connections[idx2];
+
+            if (con1.globalId === con2.globalId) {
+                idx1++;
+                idx2++;
+                common++;
+                weightDelta += Math.abs(con1.weight - con2.weight);
+            } else if (con1.globalId > con2.globalId) {
+                idx2++;
+                disjoint++;
+            } else {
+                idx1++;
+                disjoint++;
+            }
+        }
+
+        excess += indiv1.connections.length - idx1;
+        const n = indiv1.connections.length > indiv2.connections.length
+            ? indiv1.connections.length
+            : indiv2.connections.length;
+
+        return (Neat.config.c1 ?? 1) * disjoint / n +
+            (Neat.config.c2 ?? 1) * excess / n +
+            (Neat.config.c3 ?? 1) * weightDelta / common;
     }
 
     crossover(other: IGenome): IGenome {

@@ -3,7 +3,6 @@ import { INeatConfig } from "./INeatConfig";
 
 export interface INeat {
     individuals: Individual[];
-    config: INeatConfig;
 
     crossOver(): void;
     mutate(force?: boolean, rand?: number): void;
