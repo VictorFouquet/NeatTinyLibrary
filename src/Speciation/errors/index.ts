@@ -1,0 +1,1 @@
+export { UnknownSpeciesError } from "./UnknownSpeciesError";
