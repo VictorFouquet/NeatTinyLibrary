@@ -2,7 +2,7 @@ import { ConnectionVariation } from "../../src/Connection";
 import { Genome } from "../../src/Genome";
 import { Innovation } from "../../src/Innovation"
 import { NodeVariation } from "../../src/Node";
-import { Speciation, UnknownSpeciesError } from "../../src/Speciation";
+import { ForbiddenExtinctError, Speciation, UnknownExtinctError, UnknownSpeciesError } from "../../src/Speciation";
 
 beforeEach(() => {
     Speciation.clear();
@@ -34,8 +34,8 @@ test("Speciation should check if a species exists", () => {
 });
 
 test("Speciation should throw error when getting unknown species", () => {
-    Innovation.init(2, 1);
-
+    expect(() => Speciation.getSpecies(0)).toThrow(UnknownSpeciesError);
+    expect(() => Speciation.getSpecies(10)).toThrow(UnknownSpeciesError);
     expect(() => Speciation.getSpecies(-1)).toThrow(UnknownSpeciesError);
 });
 
@@ -67,8 +67,6 @@ test("Speciation should categorize a genome in its corresponding species", () =>
     // d = 1 * 0 / 1 + 1 * 3 / 1 + 1 * 0
     // d = 3
     // Set threshold to 4 to have both genomes in same species
-    console.log(genome.distance(genome2))
-    console.log(genome, genome2)
     const speciesId = Speciation.speciate(genome, 4);
     expect(genome.speciesId).toBe(speciesId);
 
@@ -96,12 +94,40 @@ test("Speciation should create a new species if a genome doesnt fit in anyone ex
     // d = 1 * 0 / 1 + 1 * 3 / 1 + 1 * 0
     // d = 3
     // Set threshold to 2 to have genomes in different species
-    console.log(genome.distance(genome2))
-    console.log(genome, genome2)
     const speciesId = Speciation.speciate(genome, 2);
     expect(genome.speciesId).toBe(speciesId);
 
     const speciesId2 = Speciation.speciate(genome2, 2);
     expect(genome2.speciesId).toBe(speciesId2);
     expect(speciesId2).not.toBe(speciesId);
+});
+
+test("Speciation should extinc a species by removing it from the active species", () => {
+    Innovation.init(2,1);
+    const genome = new Genome(Innovation.nodes.map(n => new NodeVariation(n.id, 1)));
+    const species1 = Speciation.createSpecies(genome, true);
+    const species2 = Speciation.createSpecies(genome, true);
+
+    expect(species1.extinct).toBe(false);
+    expect(Speciation.activeSpecies.length).toBe(2);
+    
+    Speciation.extinct(species1.id);
+    expect(species1.extinct).toBe(true);
+    expect(Speciation.activeSpecies.length).toBe(1);
+    expect(Speciation.activeSpecies[0]).toBe(species2.id);
+});
+
+test("Speciation should throw an error when trying to extinc an unknown species", () => {
+    expect(() => Speciation.extinct(0)).toThrow(UnknownExtinctError);
+    expect(() => Speciation.extinct(10)).toThrow(UnknownExtinctError);
+    expect(() => Speciation.extinct(-1)).toThrow(UnknownExtinctError);
+});
+
+test("Speciation should throw an error when trying to extinc an inactive species", () => {
+    Innovation.init(2,1);
+    const genome = new Genome(Innovation.nodes.map(n => new NodeVariation(n.id, 1)));
+    const species1 = Speciation.createSpecies(genome, true);
+    species1.extinct = true;
+
+    expect(() => Speciation.extinct(species1.id)).toThrow(ForbiddenExtinctError);
 });
