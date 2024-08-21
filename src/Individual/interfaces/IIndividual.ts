@@ -1,8 +1,8 @@
 import { IGenome } from "../../Genome";
 
 export interface IIndividual {
-    genome:    IGenome;
-    fitness:   number;
-
-    fitnessFn: (arg: any) => number;
+    genome:          IGenome;
+    fitness:         number;
+    adjustedFitness: number;
+    speciesId:       number|null;
 }

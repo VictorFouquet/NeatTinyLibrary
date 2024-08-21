@@ -8,6 +8,8 @@ beforeEach(() => {
     Speciation.clear();
 });
 
+afterAll(() => Speciation.clear());
+
 test("Speciation should create new species", () => {
     Innovation.init(2, 1);
     const genome = new Genome(Innovation.nodes.map(n => new NodeVariation(n.id, 1)));

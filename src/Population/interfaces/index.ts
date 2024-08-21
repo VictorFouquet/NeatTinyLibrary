@@ -1,0 +1,1 @@
+export { IPopulation } from "./IPopulation";

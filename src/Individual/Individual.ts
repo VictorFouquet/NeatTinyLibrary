@@ -3,12 +3,14 @@ import { IIndividual } from "./interfaces";
 
 export class Individual implements IIndividual {
     genome: IGenome;
-    fitness: number;
-    fitnessFn: (arg: any) => number;
+    fitness: number = 0;
+    adjustedFitness: number = 0;
+    _speciesId: number|null;
 
-    constructor(genome: IGenome, fitnessFn: (arg:any) => number) {
+    constructor(genome: IGenome) {
         this.genome = genome;
-        this.fitness = 0;
-        this.fitnessFn = fitnessFn;
+        this._speciesId = genome.speciesId;
     }
+
+    get speciesId(): number|null { return this.genome.speciesId; }
 }

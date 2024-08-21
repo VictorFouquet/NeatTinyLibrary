@@ -37,15 +37,25 @@ export class Speciation {
         return Speciation._species[id];
     }
 
+    static setScore(id: number, score: number): void {
+        if (!SpeciationIdBuilder.Exists(id)) {
+            throw new UnknownSpeciesError(id);
+        }
+        this._species[id].score = score;
+    }
+
     static speciate(genome: IGenome, threshold: number = 4): number {
         for (let id of Speciation._activeSpecies) {
             const distance = genome.distance(Speciation._species[id].representative);
+
             if (distance < threshold) {
                 genome.speciesId = id;
                 return id;
             }
         }
+
         const species = Speciation.createSpecies(genome, false);
+
         Speciation._species[species.id] = species;
         Speciation._activeSpecies.push(species.id);
         genome.speciesId = species.id;

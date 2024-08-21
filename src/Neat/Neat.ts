@@ -25,8 +25,7 @@ export class Neat implements INeat {
                     Innovation.connections.map(c => new ConnectionVariation(
                         c.id, Math.random() * 2 - 1, true
                     ))
-                ),
-                fitnessFn
+                )
             ));
         }
     };
