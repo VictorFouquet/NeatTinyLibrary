@@ -40,9 +40,37 @@ export class Population implements IPopulation {
         return this.fitnessFn(individual, inputs);
     }
 
+    crossOver(): IIndividual[] {
+        const newGeneration: IIndividual[] = [];
+        for (let [species, individuals] of Object.entries(this._currentGeneration)) {
+            const offspringCount = Math.round(
+                Speciation.getSpecies(+species).score / 
+                this.averageScore * 
+                individuals.length
+            );
+            
+            const parentsToSave = Math.max(1, offspringCount * 0.2);
+            const childrenToCreate = offspringCount - parentsToSave;
+            for (let i = 0; i < childrenToCreate; i++) {
+                let parent1 = individuals[Math.floor(Math.random() * individuals.length)];
+                let parent2 = parent1;
+                while (parent1 === parent2 && individuals.length > 1) {
+                    individuals[Math.floor(Math.random() * individuals.length)];
+                }
+                if (parent1.adjustedFitness! < parent2.adjustedFitness!) {
+                    [parent1, parent2] = [parent2, parent1];
+                }
+                const childGenome = parent1.genome.crossover(parent2.genome);
+                newGeneration.push(new Individual(childGenome));
             }
-            Speciation.setScore(individuals[0].speciesId!, speciesScore);
+
+            const parents = individuals.slice();
+            for (let i = 0; i < parentsToSave; i++) {
+                newGeneration.push(parents.splice(Math.floor(Math.random() * parents.length), 1)[0])
+            }
         }
+
+        return newGeneration;
     }
 
     groupIndividualsBySpecies(): IIndividual[][] {
