@@ -1,0 +1,1 @@
+export { ISpecies } from "./ISpecies";
