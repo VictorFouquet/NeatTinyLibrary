@@ -37,8 +37,8 @@ test("Genome should compute its distance to another genome", () => {
     const common = 3;
     const deltaW = 3; // Delta of 1 between each common connection
 
-    const distance = Neat.config.c1 * disjoint / parent1.connections.length +
-        Neat.config.c2 * excess / parent1.connections.length +
+    const distance = Neat.config.c1 * disjoint +
+        Neat.config.c2 * excess +
         deltaW / common;
     expect(parent1.distance(parent2)).toBe(distance);
 });
@@ -71,8 +71,8 @@ test("Genome should take excess gene from genome containing the highest global i
     const common = 2;
     const deltaW = 2; // Delta of 1 between each common connection
 
-    const distance = Neat.config.c1 * disjoint / parent2.connections.length +
-        Neat.config.c2 * excess / parent2.connections.length +
+    const distance = Neat.config.c1 * disjoint +
+        Neat.config.c2 * excess +
         deltaW / common;
     expect(parent1.distance(parent2)).toBe(distance);
 });

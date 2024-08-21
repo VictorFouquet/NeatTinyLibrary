@@ -13,6 +13,7 @@ export class Genome implements IGenome {
 
     nodes: INodeVariation[];
     connections: IConnectionVariation[];
+    speciesId: number = -1;
 
     constructor(nodes: INodeVariation[], connections: IConnectionVariation[] = []) {
         this.nodes = nodes;
@@ -70,9 +71,9 @@ export class Genome implements IGenome {
         }
 
         excess += indiv1.connections.length - idx1;
-        const n = indiv1.connections.length > indiv2.connections.length
+        const n = Math.min(1, Math.max(20, indiv1.connections.length > indiv2.connections.length
             ? indiv1.connections.length
-            : indiv2.connections.length;
+            : indiv2.connections.length));
 
         return (Neat.config.c1 ?? 1) * disjoint / n +
             (Neat.config.c2 ?? 1) * excess / n +
