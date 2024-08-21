@@ -12,8 +12,17 @@ export class Speciation {
     static get currentGeneration(): number[] { return Speciation._currentGeneration.slice(); }
     static get previousGeneration(): number[] { return Speciation._previousGeneration.slice(); }
 
-    static createSpecies(representative: IGenome) {
-        return new Species(SpeciationIdBuilder.Next(), representative);
+    static clear(): void {
+        Speciation._species = {}
+        Speciation._currentGeneration = [];
+        Speciation._previousGeneration = [];
+        SpeciationIdBuilder.Clear();
+    }
+
+    static createSpecies(representative: IGenome): ISpecies {
+        const id = SpeciationIdBuilder.Next();
+        Speciation._species[id] = new Species(id, representative);
+        return Speciation._species[id];
     }
 
     static exists(id: number): boolean {
@@ -31,13 +40,21 @@ export class Speciation {
         for (let id of Speciation._previousGeneration) {
             const distance = genome.distance(Speciation._species[id].representative);
             if (distance < threshold) {
+                genome.speciesId = id;
                 return id;
             }
         }
-
+        for (let id of Speciation._currentGeneration) {
+            const distance = genome.distance(Speciation._species[id].representative);
+            if (distance < threshold) {
+                genome.speciesId = id;
+                return id;
+            }
+        }
         const species = Speciation.createSpecies(genome);
         Speciation._species[species.id] = species;
         Speciation._currentGeneration.push(species.id);
+        genome.speciesId = species.id;
 
         return species.id;
     }
@@ -48,10 +65,14 @@ class SpeciationIdBuilder {
 
     static Next(): number {
         this._current++;
-        return this._current;
+        return SpeciationIdBuilder._current;
     }
 
     static Exists(id: number): boolean {
-        return id <= this._current; 
+        return id <= SpeciationIdBuilder._current; 
+    }
+
+    static Clear(): void {
+        SpeciationIdBuilder._current = 0;
     }
 }

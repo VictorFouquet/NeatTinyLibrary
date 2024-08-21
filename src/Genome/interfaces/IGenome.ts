@@ -4,6 +4,7 @@ import { INodeVariation } from "../../Node";
 export interface IGenome {
     nodes: INodeVariation[];
     connections: IConnectionVariation[];
+    speciesId: number;
 
     distance(other: IGenome): number;
     crossover(other: IGenome): IGenome;

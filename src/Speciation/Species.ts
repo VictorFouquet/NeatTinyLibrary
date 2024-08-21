@@ -8,5 +8,6 @@ export class Species implements ISpecies {
     constructor(id: number, representative: IGenome) {
         this.id = id;
         this.representative = representative;
+        representative.speciesId = this.id;
     }
 }
