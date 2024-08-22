@@ -55,12 +55,13 @@ export class Population implements IPopulation {
                 let parent1 = individuals[Math.floor(Math.random() * individuals.length)];
                 let parent2 = parent1;
                 while (parent1 === parent2 && individuals.length > 1) {
-                    individuals[Math.floor(Math.random() * individuals.length)];
+                    parent2 = individuals[Math.floor(Math.random() * individuals.length)];
                 }
                 if (parent1.adjustedFitness! < parent2.adjustedFitness!) {
                     [parent1, parent2] = [parent2, parent1];
                 }
                 const childGenome = parent1.genome.crossover(parent2.genome);
+                childGenome.speciesId = +species;
                 newGeneration.push(new Individual(childGenome));
             }
 

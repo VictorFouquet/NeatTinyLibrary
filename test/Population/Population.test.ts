@@ -92,3 +92,58 @@ test("Population should compute species and individuals scores", () => {
     expect(indiv2.fitness).toBe(10);
     expect(indiv4.fitness).toBe(30);
 });
+
+test("Population should compute species and individuals scores", () => {
+    Innovation.init(2,1);
+
+    const indiv1 = new Individual(new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, 10)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, 10))
+    ));
+    const indiv2 = new Individual(new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, -10)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, -10))
+    ));
+    const indiv3 = new Individual(new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, 10)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, 10))
+    ));
+    const indiv4 = new Individual(new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, -10)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, -10))
+    ));
+
+    const fitnessFn = (indiv: IIndividual, inputs: number[]) => {
+        switch(indiv) {
+            case indiv1:
+                return 1;
+            case indiv2:
+                return 2;
+            case indiv3:
+                return 3;
+            case indiv4:
+                return 6;
+            default:
+                return 0;
+        }
+    }
+    const population = new Population(
+        fitnessFn,
+        [ indiv1, indiv2, indiv3, indiv4]
+    );
+
+    population.computeScores([]);
+    const offspring = population.crossOver();
+    // Species 1 has round(1 / 1.5 * 2) = 1 individual (parent only)
+    const species1 = offspring.filter(i => i.speciesId === 1);
+    expect(species1.length).toBe(1);
+    expect([indiv1, indiv3].includes(species1[0])).toBe(true);
+    // Species 2 has round(2 / 1.5 * 2) = 3 individual (2 children 1 parent)
+    const species2 = offspring.filter(i => i.speciesId === 2);
+    expect(species2.length).toBe(3);
+    // Parents are added after children
+    const parent = species2.pop();
+    expect([indiv2, indiv4].includes(parent!));
+    expect([indiv1, indiv2, indiv3, indiv4].includes(species2[0])).toBe(false);
+    expect([indiv1, indiv2, indiv3, indiv4].includes(species2[1])).toBe(false);
+});
