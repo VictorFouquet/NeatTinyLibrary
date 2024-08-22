@@ -7,6 +7,10 @@ import { NodeVariation } from "../../src/Node";
 import { Population } from "../../src/Population";
 import { Speciation } from "../../src/Speciation";
 
+beforeEach(() => {
+    Speciation.clear();
+})
+
 test("Population should group individuals by species", () => {
     Innovation.init(2,1);
 
@@ -146,4 +150,75 @@ test("Population should compute species and individuals scores", () => {
     expect([indiv2, indiv4].includes(parent!));
     expect([indiv1, indiv2, indiv3, indiv4].includes(species2[0])).toBe(false);
     expect([indiv1, indiv2, indiv3, indiv4].includes(species2[1])).toBe(false);
+});
+
+test("Population should extinct the species that didnt improve for 15 generations", () => {
+    Innovation.init(2,1);
+
+    const indiv1 = new Individual(new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, 10)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, 10))
+    ));
+    const indiv2 = new Individual(new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, -10)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, -10))
+    ));
+    const indiv3 = new Individual(new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, 10)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, 10))
+    ));
+    const indiv4 = new Individual(new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, -10)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, -10))
+    ));
+
+    const fitnessFn = (indiv: IIndividual, inputs: number[]) => 0
+    const population = new Population(
+        fitnessFn,
+        [ indiv1, indiv2, indiv3, indiv4]
+    );
+
+    population.groupIndividualsBySpecies();
+    const species1 = Speciation.getSpecies(1);
+    expect(species1.score).toBe(0);
+    for (let i = 0; i < 15; i++) {
+        Speciation.setScore(species1.id, 0);
+    }
+    expect(species1.noImprovement).toBe(15);
+    population.extinct([1, 2]);
+    expect(species1.extinct).toBe(true);
+    expect(Speciation.activeSpecies.length).toBe(1);
+});
+
+test("Population should extinct the species that no longer have individuals in the new generation", () => {
+    Innovation.init(2,1);
+
+    const indiv1 = new Individual(new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, 10)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, 10))
+    ));
+    const indiv2 = new Individual(new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, -10)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, -10))
+    ));
+    const indiv3 = new Individual(new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, 10)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, 10))
+    ));
+    const indiv4 = new Individual(new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, -10)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, -10))
+    ));
+
+    const fitnessFn = (indiv: IIndividual, inputs: number[]) => 0
+    const population = new Population(
+        fitnessFn,
+        [ indiv1, indiv2, indiv3, indiv4]
+    );
+
+    population.groupIndividualsBySpecies();
+    population.extinct([2]);
+    expect(Speciation.getSpecies(1).extinct).toBe(true);
+    expect(Speciation.getSpecies(2).extinct).toBe(false);
+    expect(Speciation.activeSpecies.length).toBe(1);
 });

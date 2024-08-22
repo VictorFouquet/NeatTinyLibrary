@@ -6,6 +6,7 @@ export class Species implements ISpecies {
     readonly representative: IGenome;
     extinct: boolean;
     score: number;
+    noImprovement: number = 0;
 
     constructor(id: number, representative: IGenome) {
         this.id = id;

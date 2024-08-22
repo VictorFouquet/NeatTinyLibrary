@@ -89,4 +89,32 @@ export class Population implements IPopulation {
 
         return Object.values(this._currentGeneration).filter(group => group.length > 0);
     }
+
+    extinct(speciesIds: number[]): void {
+        // Extincts species that didnt improve
+        for (let speciesId of speciesIds) {
+            const species = Speciation.getSpecies(speciesId);
+            if (species.noImprovement === 15) {
+                Speciation.extinct(speciesId);
+            }
+        }
+        // Extincts species that no longer have individuals
+        for (let speciesId of Speciation.activeSpecies) {
+            if (
+                !speciesIds.includes(speciesId) &&
+                !Speciation.getSpecies(speciesId).extinct
+            ) {
+                Speciation.extinct(speciesId)
+            }
+        }
+    }
+
+    evolve(inputs: number[]): void {
+        // this.computeScores(inputs);
+        // const offspring = this.crossOver();
+        // this.extinct(offspring.map(i => i.speciesId!));
+        // this.mutate(offspring);
+        // this._currentGeneration = {};
+        // this.groupIndividualsBySpecies();
+    }
 }
