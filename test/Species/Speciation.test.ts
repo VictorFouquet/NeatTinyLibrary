@@ -119,6 +119,17 @@ test("Speciation should extinc a species by removing it from the active species"
     expect(Speciation.activeSpecies[0]).toBe(species2.id);
 });
 
+test("Speciation increment the no improvement count if its new score is the same as its previous one", () => {
+    Innovation.init(2,1);
+    const genome = new Genome(Innovation.nodes.map(n => new NodeVariation(n.id, 1)));
+    const species1 = Speciation.createSpecies(genome, true);
+    expect(species1.score).toBe(0);
+    expect(species1.noImprovement).toBe(0);
+
+    Speciation.setScore(species1.id, 0);
+    expect(species1.noImprovement).toBe(1);
+});
+
 test("Speciation should throw an error when trying to extinc an unknown species", () => {
     expect(() => Speciation.extinct(0)).toThrow(UnknownExtinctError);
     expect(() => Speciation.extinct(10)).toThrow(UnknownExtinctError);
