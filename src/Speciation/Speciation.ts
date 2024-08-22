@@ -41,6 +41,11 @@ export class Speciation {
         if (!SpeciationIdBuilder.Exists(id)) {
             throw new UnknownSpeciesError(id);
         }
+
+        if (this._species[id].score === score) {
+            this._species[id].noImprovement++;
+        }
+
         this._species[id].score = score;
     }
 
