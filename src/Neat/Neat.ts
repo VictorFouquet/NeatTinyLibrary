@@ -37,44 +37,7 @@ export class Neat implements INeat {
     }
 
     mutate(force: boolean = false, _rand?: number): void {
-        for (let individual of this.individuals) {
-            const genome = individual.genome;
-            if (force === false && Math.random() < Neat.config.mutationThreshold) {
-                continue;
-            }
-            const rand = _rand !== undefined ? _rand : Math.random();
-            let sum = Neat.config.resetBiasThreshold;
-            if (rand < sum && genome.nodes.length > 0) {
-                genome.mutateNodeBias(genome.getRandomNode().id);
-                continue;
-            }
 
-            sum += Neat.config.shiftWeightThreshold;
-            if (rand < sum && genome.connections.length > 0) {
-                genome.mutateConnectionWeightShift(genome.getRandomConnection().id);
-                continue;
-            }
-
-            sum += Neat.config.resetWeightThreshold;
-            if (rand < sum && genome.connections.length > 0) {
-                genome.mutateConnectionWeight(genome.getRandomConnection().id);
-                continue;
-            }
-
-            sum += Neat.config.resetEnabledThreshold;
-            if (rand < sum && genome.connections.length > 0) {
-                genome.mutateConnectionEnabled(genome.getRandomConnection().id);
-                continue;
-            }
-
-            sum += Neat.config.addConnectionThreshold;
-            if (rand < sum && !genome.isFullyConnected()) {
-                genome.addConnection();
-                continue;
-            }
-
-            genome.addNode();
-        }
     }
 
     speciate(): void {
