@@ -9,4 +9,5 @@ export interface IPopulation {
     extinct(speciesIds: number[]): void 
     fitnessFn: (individual: IIndividual, inputs: number[]) => number;
     groupIndividualsBySpecies(): IIndividual[][]
+    mutate(individuals: IIndividual[]): void;
 }

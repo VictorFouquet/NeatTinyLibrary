@@ -1,4 +1,5 @@
 import { IIndividual, Individual } from "../Individual";
+import { Neat } from "../Neat";
 import { Speciation } from "../Speciation";
 import { IPopulation } from "./interfaces";
 
@@ -106,6 +107,49 @@ export class Population implements IPopulation {
             ) {
                 Speciation.extinct(speciesId)
             }
+        }
+    }
+
+    mutate(individuals: IIndividual[], force: boolean = false, rand_?: number): void {
+        for (let indiv of individuals) {
+            if (force === false && Math.random() < Neat.config.mutationThreshold) {
+                continue;
+            }
+
+            const genome = indiv.genome;
+
+            const rand = rand_ !== undefined ? rand_ : Math.random();
+            let sum = Neat.config.resetBiasThreshold;
+            if (rand < sum && genome.nodes.length > 0) {
+                genome.mutateNodeBias(genome.getRandomNode().id);
+                continue;
+            }
+
+            sum += Neat.config.shiftWeightThreshold;
+            if (rand < sum && genome.connections.length > 0) {
+                genome.mutateConnectionWeightShift(genome.getRandomConnection().id);
+                continue;
+            }
+
+            sum += Neat.config.resetWeightThreshold;
+            if (rand < sum && genome.connections.length > 0) {
+                genome.mutateConnectionWeight(genome.getRandomConnection().id);
+                continue;
+            }
+
+            sum += Neat.config.resetEnabledThreshold;
+            if (rand < sum && genome.connections.length > 0) {
+                genome.mutateConnectionEnabled(genome.getRandomConnection().id);
+                continue;
+            }
+
+            sum += Neat.config.addConnectionThreshold;
+            if (rand < sum && !genome.isFullyConnected()) {
+                genome.addConnection();
+                continue;
+            }
+
+            genome.addNode();
         }
     }
 
