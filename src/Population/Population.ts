@@ -1,3 +1,4 @@
+import { IEnvironment } from "../Environment";
 import { IIndividual, Individual } from "../Individual";
 import { Neat } from "../Neat";
 import { Speciation } from "../Speciation";
@@ -5,17 +6,20 @@ import { IPopulation } from "./interfaces";
 
 export class Population implements IPopulation {
     private _currentGeneration: { [id: number]: IIndividual[] } = {};
+    private _environment: IEnvironment;
+
     individuals: IIndividual[];
     averageScore: number = 0;
-    fitnessFn: (individual: IIndividual, inputs: number[]) => number;
 
     constructor(
-        fitnessFn: (individual: IIndividual, inputs: number[]) => number,
+        environment: IEnvironment,
         individuals: IIndividual[] = []
     ) {
+        this._environment = environment;
         this.individuals = individuals;
-        this.fitnessFn = fitnessFn;
     }
+
+    get environment(): IEnvironment { return this._environment; }
 
     computeScores(inputs: number[]): void {
         // Assign each individual to its species according to its genome
@@ -38,7 +42,7 @@ export class Population implements IPopulation {
     }
 
     evaluateIndividual(individual: IIndividual, inputs: number[]): number {
-        return this.fitnessFn(individual, inputs);
+        return this.environment.evaluate(individual, inputs);
     }
 
     crossOver(): IIndividual[] {

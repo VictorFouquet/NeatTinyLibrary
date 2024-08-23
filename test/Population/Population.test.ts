@@ -8,6 +8,7 @@ import { NeatConfig } from "../../src/Neat/NeatConfig";
 import { NodeVariation } from "../../src/Node";
 import { Population } from "../../src/Population";
 import { Speciation } from "../../src/Speciation";
+import { EmptyEnvironment } from "../Environment/EmptyEnvironment.mock";
 
 const config = Config.test;
 config.populationSize = 1;
@@ -33,6 +34,13 @@ const fitnessFnSwitch = (indiv: IIndividual, inputs: number[]) => {
     }
 }
 
+const DefaultEnvironment = new EmptyEnvironment(
+    () => false,
+    (indiv: IIndividual) => [0, 0],
+    fitnessFnSwitch,
+    () => {}
+);
+
 beforeEach(() => {
     Speciation.clear();
     Innovation.init(2,1);
@@ -55,10 +63,8 @@ beforeEach(() => {
 })
 
 test("Population should group individuals by species", () => {
-    const fitnessFn = (indiv: IIndividual, args: number[]) => 1;
-
     const population = new Population(
-        fitnessFn,
+        DefaultEnvironment,
         [ indiv1, indiv2, indiv3, indiv4 ]
     );
 
@@ -70,7 +76,7 @@ test("Population should group individuals by species", () => {
 
 test("Population should compute species and individuals scores", () => {
     const population = new Population(
-        fitnessFnSwitch,
+        DefaultEnvironment,
         [ indiv1, indiv2, indiv3, indiv4]
     );
 
@@ -95,7 +101,7 @@ test("Population should compute species and individuals scores", () => {
 
 test("Population should compute species and individuals scores", () => {
     const population = new Population(
-        fitnessFnSwitch,
+        DefaultEnvironment,
         [ indiv1, indiv2, indiv3, indiv4]
     );
 
@@ -116,9 +122,8 @@ test("Population should compute species and individuals scores", () => {
 });
 
 test("Population should extinct the species that didnt improve for 15 generations", () => {
-    const fitnessFn = (indiv: IIndividual, inputs: number[]) => 0
     const population = new Population(
-        fitnessFn,
+        DefaultEnvironment,
         [ indiv1, indiv2, indiv3, indiv4]
     );
 
@@ -135,9 +140,8 @@ test("Population should extinct the species that didnt improve for 15 generation
 });
 
 test("Population should extinct the species that no longer have individuals in the new generation", () => {
-    const fitnessFn = (indiv: IIndividual, inputs: number[]) => 0
     const population = new Population(
-        fitnessFn,
+        DefaultEnvironment,
         [ indiv1, indiv2, indiv3, indiv4]
     );
 
@@ -156,7 +160,7 @@ test("Population should mutate a genome bias", () => {
         Innovation.connections.map(c => new ConnectionVariation(c.id, 1))
     ))
     const population = new Population(
-        (indiv: IIndividual, inputs: number[]) => 1,
+        DefaultEnvironment,
         [ individual ]
     );
     const input = individual.genome.nodes[0];
@@ -178,7 +182,7 @@ test("Population should reset a genome connection weight", () => {
         Innovation.connections.map(c => new ConnectionVariation(c.id, 1))
     ))
     const population = new Population(
-        (indiv: IIndividual, inputs: number[]) => 1,
+        DefaultEnvironment,
         [ individual ]
     );
 
@@ -200,7 +204,7 @@ test("Neat should shift a genome connection weight", () => {
         Innovation.connections.map(c => new ConnectionVariation(c.id, 1))
     ))
     const population = new Population(
-        (indiv: IIndividual, inputs: number[]) => 1,
+        DefaultEnvironment,
         [ individual ]
     );
 
@@ -222,7 +226,7 @@ test("Neat should disable a genome connection", () => {
         Innovation.connections.map(c => new ConnectionVariation(c.id, 1))
     ))
     const population = new Population(
-        (indiv: IIndividual, inputs: number[]) => 1,
+        DefaultEnvironment,
         [ individual ]
     );
 
@@ -244,7 +248,7 @@ test("Neat should add a connection to a genome", () => {
         Innovation.connections.map(c => new ConnectionVariation(c.id, 1))
     ))
     const population = new Population(
-        (indiv: IIndividual, inputs: number[]) => 1,
+        DefaultEnvironment,
         [ individual ]
     );
 
@@ -267,7 +271,7 @@ test("Neat should add a node to a genome", () => {
         Innovation.connections.map(c => new ConnectionVariation(c.id, 1))
     ))
     const population = new Population(
-        (indiv: IIndividual, inputs: number[]) => 1,
+        DefaultEnvironment,
         [ individual ]
     );
     expect(individual.genome.nodes).toHaveLength(2);
