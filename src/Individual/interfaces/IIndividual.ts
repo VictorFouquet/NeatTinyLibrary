@@ -5,4 +5,7 @@ export interface IIndividual {
     fitness:         number;
     adjustedFitness: number;
     speciesId:       number|null;
+    outputs:         number[];
+
+    makeDecision(inputs: number[]): void;
 }
