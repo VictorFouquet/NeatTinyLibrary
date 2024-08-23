@@ -153,12 +153,12 @@ export class Population implements IPopulation {
         }
     }
 
-    evolve(inputs: number[]): void {
+    evolve(inputs: number[]): IIndividual[] {
         // this.computeScores(inputs);
         // const offspring = this.crossOver();
         // this.extinct(offspring.map(i => i.speciesId!));
         // this.mutate(offspring);
-        // this._currentGeneration = {};
-        // this.groupIndividualsBySpecies();
+        // return offspring;
+        return [];
     }
 }
