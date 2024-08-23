@@ -165,4 +165,18 @@ export class Population implements IPopulation {
         // return offspring;
         return [];
     }
+
+    live(): boolean {
+        if (this.environment.shouldTriggerNewGeneration()) {
+            this.evolve()
+        }
+        for (let indiv of this.individuals) {
+            const inputs = this.environment.getInput(indiv);
+            indiv.makeDecision(inputs);
+            this.environment.handleDecision(indiv);
+        }
+        this.environment.update();
+
+        return true;
+    }
 }
