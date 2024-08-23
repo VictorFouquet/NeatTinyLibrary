@@ -21,7 +21,7 @@ export class Population implements IPopulation {
 
     get environment(): IEnvironment { return this._environment; }
 
-    computeScores(inputs: number[]): void {
+    computeScores(): void {
         // Assign each individual to its species according to its genome
         this.groupIndividualsBySpecies();
         let speciesCount = 0;
@@ -29,7 +29,7 @@ export class Population implements IPopulation {
             speciesCount++;
             let speciesScore = 0;
             for (let individual of individuals) {
-                individual.fitness = this.evaluateIndividual(individual, inputs);
+                individual.fitness = this.evaluateIndividual(individual);
                 individual.adjustedFitness = individual.fitness / individuals.length;
                 speciesScore += individual.adjustedFitness;
             }
@@ -41,8 +41,8 @@ export class Population implements IPopulation {
             this.averageScore /= speciesCount;
     }
 
-    evaluateIndividual(individual: IIndividual, inputs: number[]): number {
-        return this.environment.evaluate(individual, inputs);
+    evaluateIndividual(individual: IIndividual): number {
+        return this.environment.evaluate(individual);
     }
 
     crossOver(): IIndividual[] {
@@ -157,8 +157,8 @@ export class Population implements IPopulation {
         }
     }
 
-    evolve(inputs: number[]): IIndividual[] {
-        // this.computeScores(inputs);
+    evolve(): IIndividual[] {
+        // this.computeScores();
         // const offspring = this.crossOver();
         // this.extinct(offspring.map(i => i.speciesId!));
         // this.mutate(offspring);

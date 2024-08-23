@@ -8,7 +8,7 @@ export interface IPopulation {
     computeScores(inputs: number[]): void;
     crossOver(): IIndividual[]
     evaluateIndividual(individual: IIndividual, inputs: number[]): number
-    evolve(inputs: number[]): IIndividual[];
+    evolve(): IIndividual[];
     extinct(speciesIds: number[]): void 
     groupIndividualsBySpecies(): IIndividual[][]
     mutate(individuals: IIndividual[]): void;
