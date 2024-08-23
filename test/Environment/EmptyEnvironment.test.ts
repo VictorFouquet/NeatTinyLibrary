@@ -7,17 +7,21 @@ test("Mock empty environment should return the same result as its argument funct
     const score = Math.random();
     const shouldTrigger = () => trig;
     const getInput = (indiv: IIndividual) => [1,2,3];
-    const evaluate = (indiv: IIndividual, output: number[]) => score;
+    const handleDecision = (indiv: IIndividual) => {};
+    const evaluate = (indiv: IIndividual) => score;
     const update = () => {};
+
     const mock = new EmptyEnvironment(
         shouldTrigger,
         getInput,
+        handleDecision,
         evaluate,
         update
     );
     const indiv = new Individual(new Genome([]));
     expect(mock.shouldTriggerNewGeneration()).toBe(shouldTrigger());
     expect(mock.getInput(indiv)).toEqual(getInput(indiv));
-    expect(mock.evaluate(indiv, [0])).toEqual(evaluate(indiv, [0]));
+    expect(mock.handleDecision(indiv)).toBe(undefined);
+    expect(mock.evaluate(indiv)).toEqual(evaluate(indiv));
     expect(mock.update()).toBe(undefined);
 });
