@@ -19,7 +19,7 @@ let indiv2: IIndividual;
 let indiv3: IIndividual;
 let indiv4: IIndividual;
 
-const fitnessFnSwitch = (indiv: IIndividual, inputs: number[]) => {
+const fitnessFnSwitch = (indiv: IIndividual) => {
     switch(indiv) {
         case indiv1:
             return 1;
@@ -37,6 +37,7 @@ const fitnessFnSwitch = (indiv: IIndividual, inputs: number[]) => {
 const DefaultEnvironment = new EmptyEnvironment(
     () => false,
     (indiv: IIndividual) => [0, 0],
+    () => {},
     fitnessFnSwitch,
     () => {}
 );
@@ -80,7 +81,7 @@ test("Population should compute species and individuals scores", () => {
         [ indiv1, indiv2, indiv3, indiv4]
     );
 
-    population.computeScores([]);
+    population.computeScores();
     expect(indiv1.fitness).toBe(1);
     expect(indiv1.adjustedFitness).toBe(0.5);
     expect(indiv3.fitness).toBe(3);
@@ -105,7 +106,7 @@ test("Population should compute species and individuals scores", () => {
         [ indiv1, indiv2, indiv3, indiv4]
     );
 
-    population.computeScores([]);
+    population.computeScores();
     const offspring = population.crossOver();
     // Species 1 has round(1 / 1.5 * 2) = 1 individual (parent only)
     const species1 = offspring.filter(i => i.speciesId === 1);
