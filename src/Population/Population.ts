@@ -1,3 +1,4 @@
+import { IEnvironment } from "../Environment";
 import { IIndividual, Individual } from "../Individual";
 import { Neat } from "../Neat";
 import { Speciation } from "../Speciation";
@@ -5,19 +6,22 @@ import { IPopulation } from "./interfaces";
 
 export class Population implements IPopulation {
     private _currentGeneration: { [id: number]: IIndividual[] } = {};
+    private _environment: IEnvironment;
+
     individuals: IIndividual[];
     averageScore: number = 0;
-    fitnessFn: (individual: IIndividual, inputs: number[]) => number;
 
     constructor(
-        fitnessFn: (individual: IIndividual, inputs: number[]) => number,
+        environment: IEnvironment,
         individuals: IIndividual[] = []
     ) {
+        this._environment = environment;
         this.individuals = individuals;
-        this.fitnessFn = fitnessFn;
     }
 
-    computeScores(inputs: number[]): void {
+    get environment(): IEnvironment { return this._environment; }
+
+    computeScores(): void {
         // Assign each individual to its species according to its genome
         this.groupIndividualsBySpecies();
         let speciesCount = 0;
@@ -25,7 +29,7 @@ export class Population implements IPopulation {
             speciesCount++;
             let speciesScore = 0;
             for (let individual of individuals) {
-                individual.fitness = this.evaluateIndividual(individual, inputs);
+                individual.fitness = this.evaluateIndividual(individual);
                 individual.adjustedFitness = individual.fitness / individuals.length;
                 speciesScore += individual.adjustedFitness;
             }
@@ -37,8 +41,8 @@ export class Population implements IPopulation {
             this.averageScore /= speciesCount;
     }
 
-    evaluateIndividual(individual: IIndividual, inputs: number[]): number {
-        return this.fitnessFn(individual, inputs);
+    evaluateIndividual(individual: IIndividual): number {
+        return this.environment.evaluate(individual);
     }
 
     crossOver(): IIndividual[] {
@@ -153,12 +157,26 @@ export class Population implements IPopulation {
         }
     }
 
-    evolve(inputs: number[]): IIndividual[] {
-        // this.computeScores(inputs);
+    evolve(): IIndividual[] {
+        // this.computeScores();
         // const offspring = this.crossOver();
         // this.extinct(offspring.map(i => i.speciesId!));
         // this.mutate(offspring);
         // return offspring;
         return [];
+    }
+
+    live(): boolean {
+        if (this.environment.shouldTriggerNewGeneration()) {
+            this.evolve()
+        }
+        for (let indiv of this.individuals) {
+            const inputs = this.environment.getInput(indiv);
+            indiv.makeDecision(inputs);
+            this.environment.handleDecision(indiv);
+        }
+        this.environment.update();
+
+        return true;
     }
 }
