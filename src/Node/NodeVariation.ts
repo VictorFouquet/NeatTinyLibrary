@@ -5,11 +5,13 @@ import { Node } from "./Node";
 
 export class NodeVariation extends Node implements INodeVariation {
     bias: number;
+    output: number;
 
     constructor(id: number, bias: number) {
         const node = Innovation.getNodeById(id);
         super(id, node.globalId, node.type);
         this.bias = bias;
+        this.output = 0;
     }
 
     mutate() : INodeVariation {
