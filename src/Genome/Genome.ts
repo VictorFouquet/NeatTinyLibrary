@@ -27,13 +27,17 @@ export class Genome implements IGenome {
      * @returns full connectivity status
      */
     isFullyConnected(): boolean { // TODO: update for nodes x comparison
-        for (let node of this.filterOutputNodes()) {
-            for (let other of this.filterInputNodes()) {
-                if (node.equals(other))
+        this.setNodesX();
+        const sorted = this.nodes.sort((a,b) => a.x - b.x);
+        for (let i = 0; i < sorted.length; i++) {
+            for (let j = i + 1; j < sorted.length; j++) {
+                if (sorted[j].x === 0) {
                     continue;
+                }
+
                 if (
-                    !this.containsConnection(new ConnectionId(node.id, other.id)) &&
-                    !this.containsConnection(new ConnectionId(other.id, node.id))
+                    !this.containsConnection(new ConnectionId(sorted[i].id, sorted[j].id)) &&
+                    !this.containsConnection(new ConnectionId(sorted[j].id, sorted[i].id))
                 )
                     return false;
             }
@@ -252,6 +256,44 @@ export class Genome implements IGenome {
     filterInputNodes(): INodeVariation[] { return this.nodes.filter(n => !n.isInput); }
 
     filterOutputNodes(): INodeVariation[] { return this.nodes.filter(n => !n.isOutput); }
+
+    sortNodesByLayer(): number[][] {
+        const layers: number[][] = [this.getInputNodes().map(n => n.id)];
+        let nodesToLink = [
+            ...this.getHiddenNodes().map(n => n.id),
+            ...this.getOutputNodes().map(n => n.id)
+        ];
+        const linked = layers[0].slice();
+
+        while (nodesToLink.length !== 0) {
+            const layer: number[] = [];
+            for (let node of nodesToLink) {
+                let nodeAsOutConnections = this.connections.filter(c => c.enabled && c.out === node);
+                if (nodeAsOutConnections.every(c => linked.includes(c.in))) {
+                    layer.push(node);
+                }
+            }
+            
+            linked.push(...layer);
+            nodesToLink = nodesToLink.filter(n => !(linked.includes(n)));
+            layers.push(layer);
+        }
+
+        return layers;
+    }
+
+    setNodesX(): void {
+        const layered = this.sortNodesByLayer();
+        const increment = 1 / (layered.length - 1);
+        let currentX = 0;
+        for (let i = 0; i < layered.length; i++) {
+            for (let id of layered[i]) {
+                const node = this.getNode(id);
+                node.x = currentX;
+            }
+            currentX += increment;
+        }
+    }
 
     containsNode(id: number): boolean { return this.getNodeInternal(id) !== null; }
 

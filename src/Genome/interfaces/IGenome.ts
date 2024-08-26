@@ -16,6 +16,8 @@ export interface IGenome {
     getOutputNodes():    INodeVariation[];
     filterInputNodes():  INodeVariation[];
     filterOutputNodes(): INodeVariation[];
+    sortNodesByLayer():  number[][]
+    setNodesX():         void;
 
     getConnection(id: IConnectionId):               IConnectionVariation|null;
     getRandomConnection():                          IConnectionVariation;

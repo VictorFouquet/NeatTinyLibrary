@@ -180,3 +180,44 @@ test("Genome should get a random node", () => {
     expect(genome.getRandomNode()).not.toBeNull();
     expect(() => genome.getRandomNode()).not.toThrow(Error);
 });
+
+test("Genome should sort its nodes by layer", () => {
+    Innovation.init(2, 1);
+    Innovation.createHiddenNode();
+    Innovation.createConnection(1, 4);
+    Innovation.createConnection(2, 4);
+    Innovation.createConnection(4, 3);
+
+    const genome = new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, 1)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, 0.5, true))
+    );
+
+    expect(genome.sortNodesByLayer()).toEqual([[1,2], [4], [3]]);
+});
+
+test("Genome should set its nodes X values", () => {
+    Innovation.init(2, 1);
+    Innovation.createHiddenNode();
+    Innovation.createHiddenNode();
+    Innovation.createHiddenNode();
+
+    Innovation.createConnection(1, 4);
+    Innovation.createConnection(2, 4);
+    Innovation.createConnection(4, 5);
+    Innovation.createConnection(5, 6);
+    Innovation.createConnection(6, 3);
+
+    const genome = new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, 1)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, 0.5, true))
+    );
+    genome.setNodesX();
+
+    expect(genome.getNode(1).x).toEqual(0);
+    expect(genome.getNode(2).x).toEqual(0);
+    expect(genome.getNode(4).x).toBeCloseTo(0.25);
+    expect(genome.getNode(5).x).toBeCloseTo(0.5);
+    expect(genome.getNode(6).x).toBeCloseTo(0.75);
+    expect(genome.getNode(3).x).toEqual(1);
+});
