@@ -6,5 +6,4 @@ export interface INeuralNetwork {
     outputActivation: (x: number) => number;
 
     compute(genome: IGenome, inputs: number[]): number[];
-    sortNodesByLayers(genome: IGenome): number[][];
 }

@@ -221,3 +221,54 @@ test("Genome should set its nodes X values", () => {
     expect(genome.getNode(6).x).toBeCloseTo(0.75);
     expect(genome.getNode(3).x).toEqual(1);
 });
+
+test("Genome should order nodes by layers in a complex network", () => {
+    Innovation.init(2, 1);
+    Innovation.createHiddenNode();
+    Innovation.createConnection(1, 4);
+    Innovation.createConnection(2, 4);
+    Innovation.createConnection(4, 3);
+
+    let genome = new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, 1)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, 0.5, true))
+    );
+    expect(genome.sortNodesByLayer()).toEqual([[1,2],[4],[3]]);
+
+    Innovation.createHiddenNode();
+    Innovation.createConnection(1, 5);
+    Innovation.createConnection(2, 5);
+    Innovation.createConnection(5, 3);
+    genome = new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, 1)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, 0.5, true))
+    )
+    expect(genome.sortNodesByLayer()).toEqual([[1,2],[4,5],[3]]);
+
+    Innovation.createHiddenNode();
+    Innovation.createConnection(4, 6);
+    Innovation.createConnection(5, 6);
+    Innovation.createConnection(6, 3);
+    genome = new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, 1)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, 0.5, true))
+    );
+    expect(genome.sortNodesByLayer()).toEqual([[1,2],[4,5],[6],[3]]);
+
+    Innovation.createHiddenNode();
+    Innovation.createConnection(1, 7);
+    Innovation.createConnection(2, 7);
+    Innovation.createConnection(7, 4);
+    genome = new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, 1)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, 0.5, true))
+    );
+    expect(genome.sortNodesByLayer()).toEqual([[1,2],[5,7],[4],[6],[3]]);
+
+    Innovation.createConnection(7, 5);
+    genome = new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, 1)),
+        Innovation.connections.map(c => new ConnectionVariation(c.id, 0.5, true))
+    );
+    expect(genome.sortNodesByLayer()).toEqual([[1,2],[7],[4,5],[6],[3]]);
+});
