@@ -26,12 +26,15 @@ export class Genome implements IGenome {
      * - all its hidden nodes are connected to all hidden and output nodes
      * @returns full connectivity status
      */
-    isFullyConnected(): boolean {
+    isFullyConnected(): boolean { // TODO: update for nodes x comparison
         for (let node of this.filterOutputNodes()) {
             for (let other of this.filterInputNodes()) {
                 if (node.equals(other))
                     continue;
-                if (!this.containsConnection(new ConnectionId(node.id, other.id)))
+                if (
+                    !this.containsConnection(new ConnectionId(node.id, other.id)) &&
+                    !this.containsConnection(new ConnectionId(other.id, node.id))
+                )
                     return false;
             }
         }
@@ -51,7 +54,6 @@ export class Genome implements IGenome {
         let excess = 0;
         let common = 0;
         let weightDelta = 0;
-
         while (idx1 < indiv1.connections.length && idx2 < indiv2.connections.length) {
             const con1 = indiv1.connections[idx1];
             const con2 = indiv2.connections[idx2];
@@ -93,8 +95,7 @@ export class Genome implements IGenome {
 
         let idx1 = 0;
         let idx2 = 0;
-
-        while(idx1 < parent1Conns.length && idx2 < parent2Conns.length) {            
+        while(idx1 < parent1Conns.length && idx2 < parent2Conns.length) {
             if (parent1Conns[idx1].globalId === parent2Conns[idx2].globalId) {
                 childConns.push(Math.random() > 0.5 ? parent1Conns[idx1] : parent2Conns[idx2]);
                 idx1++;
@@ -131,14 +132,20 @@ export class Genome implements IGenome {
         let connectionId = new ConnectionId(nodeA.id, nodeB.id);
 
         // Avoid duplicating a connection inside the genome
-        while (this.containsConnection(connectionId) && validOut.length > 0) {
+        while ( // TODO - Update logic for nodes x comparison
+            (
+                this.containsConnection(new ConnectionId(nodeB.id, nodeA.id)) ||
+                this.containsConnection(connectionId)
+            ) &&
+            validOut.length > 0
+        ) {
             index = Math.floor(Math.random() * validOut.length);
             nodeB = validOut.splice(index)[0];
             connectionId = new ConnectionId(nodeA.id, nodeB.id);
         }
 
         // If no linkage could be done from nodeA, restart from beginning
-        if (validOut.length === 0 && this.containsConnection(connectionId)) {
+        if (validOut.length === 0 && this.containsConnection(connectionId) || this.containsConnection(new ConnectionId(nodeB.id, nodeA.id))) {
             return this.addConnection();
         }
 
@@ -147,6 +154,7 @@ export class Genome implements IGenome {
             Innovation.createConnection(connectionId.in, connectionId.out);
         }
         const connection = new ConnectionVariation(connectionId, 1, true);
+
         this.connections.push(connection);
 
         return connection;
@@ -155,7 +163,7 @@ export class Genome implements IGenome {
     addNode(): INodeVariation {
         const connection = this.getRandomConnection();
         connection.enabled = false;
-        
+
         const node = Innovation.createHiddenNode();
         
         const variationNode = new NodeVariation(node.id, Math.random());
@@ -205,6 +213,7 @@ export class Genome implements IGenome {
             throw new UnknownConnectionError(id.in, id.out);
 
         connection.mutateEnabled();
+
         return connection;
     }
 
