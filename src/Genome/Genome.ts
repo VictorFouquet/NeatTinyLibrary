@@ -5,18 +5,25 @@ import { ConnectionId, ConnectionVariation, IConnectionId, IConnectionVariation 
 import { Innovation } from "../Innovation";
 import { INodeVariation, NodeVariation } from "../Node";
 import { Neat } from "../Neat";
+import { GenomeLogger } from "./GenomeLogger";
 
 export class Genome implements IGenome {
+    private static currentId = 0;
+    private static logger = new GenomeLogger();
+
     static empty(): IGenome {
         return new Genome([]);
     }
-
+    id: number;
     nodes: INodeVariation[];
     connections: IConnectionVariation[];
     speciesId: number = -1;
     stack = 0;
 
+
     constructor(nodes: INodeVariation[], connections: IConnectionVariation[] = []) {
+        Genome.currentId++;
+        this.id = Genome.currentId;
         this.nodes = nodes;
         this.connections = connections;
         this.setNodesX();
@@ -62,7 +69,9 @@ export class Genome implements IGenome {
         let excess = 0;
         let common = 0;
         let weightDelta = 0;
-        while (idx1 < indiv1.connections.length && idx2 < indiv2.connections.length) {
+        let x = 0;
+        while (idx1 < indiv1.connections.length && idx2 < indiv2.connections.length && x < 500) {
+            x++;
             const con1 = indiv1.connections[idx1];
             const con2 = indiv2.connections[idx2];
 
@@ -79,6 +88,10 @@ export class Genome implements IGenome {
                 disjoint++;
             }
         }
+        //console.log("X1", x)
+        if (x == 500) {
+            console.log("Alert1", indiv1.connections.length, indiv2.connections.length)
+        }
 
         excess += indiv1.connections.length - idx1;
         const n = Math.min(1, Math.max(20, indiv1.connections.length > indiv2.connections.length
@@ -92,8 +105,9 @@ export class Genome implements IGenome {
 
     crossover(other: IGenome): IGenome {
         const childConns = this.crossoverConnections(other);
-
-        return new Genome(this.getNodesFromConnections(childConns), childConns);
+        const child = new Genome(this.getNodesFromConnections(childConns), childConns);
+        
+        return child;
     }
 
     private crossoverConnections(other: IGenome): IConnectionVariation[] {
@@ -103,7 +117,9 @@ export class Genome implements IGenome {
 
         let idx1 = 0;
         let idx2 = 0;
-        while(idx1 < parent1Conns.length && idx2 < parent2Conns.length) {
+        let x = 0;
+        while (idx1 < parent1Conns.length && idx2 < parent2Conns.length && x < 50) {
+            x++
             if (parent1Conns[idx1].globalId === parent2Conns[idx2].globalId) {
                 childConns.push(Math.random() > 0.5 ? parent1Conns[idx1] : parent2Conns[idx2]);
                 idx1++;
@@ -115,9 +131,17 @@ export class Genome implements IGenome {
                 idx1++;
             }
         }
+        //console.log("X5", x)
+        if (x == 50) {
+            console.log("Alert5")
+        }
 
+        const nodes = this.getNodesFromConnections(childConns);
+        const checkGenome = new Genome(nodes, childConns);
+        checkGenome.setNodesX();
+        Genome.logger.logCrossOver(this, other, checkGenome);
         if (idx1 < parent1Conns.length) {
-            childConns.push(...parent1Conns.splice(idx1));
+            childConns.push(...(parent1Conns.splice(idx1).filter(c => checkGenome.connectionIsLegal(c.in, c.out))));
         }
 
         return childConns;
@@ -145,17 +169,23 @@ export class Genome implements IGenome {
         let connectionId = new ConnectionId(nodeA.id, nodeB.id);
 
         // Avoid duplicating a connection inside the genome
-        while (!this.connectionIsLegal(nodeA.id, nodeB.id) && validOut.length > 0) {
+        let x = 0;
+        while (!this.connectionIsLegal(nodeA.id, nodeB.id) && validOut.length > 0 && x < 50) {
+            x++;
             index = Math.floor(Math.random() * validOut.length);
             nodeB = validOut.splice(index)[0];
             connectionId = new ConnectionId(nodeA.id, nodeB.id);
+        }
+        //console.log("X2", x)
+        if (x == 50) {
+            console.log("Alert2")
         }
 
         // If no linkage could be done from nodeA, restart from beginning
         if (validOut.length === 0 && !this.connectionIsLegal(nodeA.id, nodeB.id) && this.stack < 50) {
             //console.log("STACK", this.stack)
             if (this.stack === 49) {
-                //console.log(this.connections, this.nodes)
+                console.log(this.connections, this.nodes)
             }
             return this.addConnection();
         }
@@ -165,9 +195,10 @@ export class Genome implements IGenome {
             Innovation.createConnection(connectionId.in, connectionId.out);
         }
         const connection = new ConnectionVariation(connectionId, 1, true);
-
         this.connections.push(connection);
         this.setNodesX();
+
+        Genome.logger.logAddConnection(this, connection);
 
         return connection;
     }
@@ -181,25 +212,22 @@ export class Genome implements IGenome {
 
         this.nodes.push(variationNode);
 
-        this.connections.push(
-            new ConnectionVariation(
-                Innovation.getOrCreateConnection(
-                    new ConnectionId(connection.in, node.id)
-                ).id,
-                1
-            )
+        const conn1 = new ConnectionVariation(
+            Innovation.getOrCreateConnection(
+                new ConnectionId(connection.in, node.id)
+            ).id,
+            1
         );
-
-        this.connections.push(
-            new ConnectionVariation(
-                Innovation.getOrCreateConnection(
-                    new ConnectionId(node.id, connection.out)
-                ).id,
-                connection.weight
-            )
-        );
+        const conn2 = new ConnectionVariation(
+            Innovation.getOrCreateConnection(
+                new ConnectionId(node.id, connection.out)
+            ).id,
+            connection.weight
+        )
+        this.connections.push(conn1, conn2);
 
         this.setNodesX();
+        Genome.logger.logAddNode(this, node.id, conn1, conn2);
 
         return variationNode;
     }
@@ -242,9 +270,22 @@ export class Genome implements IGenome {
     }
 
     connectionIsLegal(in_: number, out: number): boolean {
-        return this.getNode(in_).x <= this.getNode(out).x &&
-               !this.containsConnection(new ConnectionId(in_, out)) &&
-               !this.containsConnection(new ConnectionId(out, in_));
+        if (!this.containsNode(in_) || !this.containsNode(out)) {
+            console.log("ALERT", this.id, in_, out)
+        }
+        const node1 = this.getNode(in_);
+        const node2 = this.getNode(out);
+        return node1.id !== node2.id &&      // Cant link node to itself
+                node1.x <= node2.x &&        // Cant link from right to left
+                !node2.isInput &&            // Cant link towards input
+                !node1.isOutput &&           // Cant link from output
+                // Cant duplicate connection
+                !this.containsConnection(new ConnectionId(node1.id, node2.id)) &&
+                // Cant make connection bi directional
+                !this.containsConnection(new ConnectionId(node2.id, node1.id))
+        // return this.getNode(in_).x <= this.getNode(out).x &&
+        //        !this.containsConnection(new ConnectionId(in_, out)) &&
+        //        !this.containsConnection(new ConnectionId(out, in_));
     }
 
     getLegalConnections(): IConnectionId[] {
@@ -297,11 +338,12 @@ export class Genome implements IGenome {
             ...this.getOutputNodes().map(n => n.id)
         ];
         const linked = layers[0].slice();
-
-        while (nodesToLink.length !== 0) {
+        let x = 0;
+        while (nodesToLink.length !== 0 && x < 50) {
+            x++;
             const layer: number[] = [];
             for (let node of nodesToLink) {
-                let nodeAsOutConnections = this.connections.filter(c => c.enabled && c.out === node);
+                let nodeAsOutConnections = this.connections.filter(c => c.out === node);
                 if (nodeAsOutConnections.every(c => linked.includes(c.in))) {
                     layer.push(node);
                 }
@@ -310,6 +352,10 @@ export class Genome implements IGenome {
             linked.push(...layer);
             nodesToLink = nodesToLink.filter(n => !(linked.includes(n)));
             layers.push(layer);
+        }
+        //console.log("X3", x)
+        if (x == 50) {
+            console.log("Alert3", this.id, nodesToLink, linked, this.connections, this.nodes)
         }
 
         return layers;

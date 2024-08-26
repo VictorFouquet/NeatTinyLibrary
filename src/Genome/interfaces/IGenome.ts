@@ -2,6 +2,7 @@ import { IConnectionId, IConnectionVariation } from "../../Connection";
 import { INodeVariation } from "../../Node";
 
 export interface IGenome {
+    id: number;
     nodes: INodeVariation[];
     connections: IConnectionVariation[];
     speciesId: number;

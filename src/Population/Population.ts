@@ -59,12 +59,18 @@ export class Population implements IPopulation {
             const parentsToSave = Math.round(Math.max(1, offspringCount * 0.2));
             const childrenToCreate = offspringCount - parentsToSave;
             for (let i = 0; i < childrenToCreate; i++) {
+                let x = 0;
                 let parent1 = individuals[Math.floor(Math.random() * individuals.length)];
                 let parent2 = parent1;
-                while (parent1 === parent2 && individuals.length > 1) {
+                while (parent1 === parent2 && individuals.length > 1 && x < 50) {
+                    x++
                     parent2 = individuals[Math.floor(Math.random() * individuals.length)];
                 }
+                //console.log("X4", x)
 
+                if (x == 50) {
+                    console.log("Alert4")
+                }
                 if (parent1.adjustedFitness! < parent2.adjustedFitness!) {
                     [parent1, parent2] = [parent2, parent1];
                 }

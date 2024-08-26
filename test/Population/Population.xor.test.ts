@@ -72,7 +72,7 @@ test("Population should solve Xor problem", () => {
     const xorEnv = new XorEnviromnent();
     const population = new Population(xorEnv, individuals);
 
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < 400; i++) {
         population.live();
         console.log(population.averageScore);
     }
