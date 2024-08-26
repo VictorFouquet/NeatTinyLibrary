@@ -1,7 +1,7 @@
 import { ConnectionVariation } from "../../src/Connection";
 import { Genome } from "../../src/Genome";
 import { Innovation } from "../../src/Innovation"
-import { NeuralNetwork } from "../../src/NeuralNetwork";
+import { ActivationFunctions, NeuralNetwork } from "../../src/NeuralNetwork";
 import { NodeVariation } from "../../src/Node";
 
 test("Neural network should feedforward data in a fully connected network with no hidden layer", () => {
@@ -10,7 +10,11 @@ test("Neural network should feedforward data in a fully connected network with n
         Innovation.nodes.map(n => new NodeVariation(n.id, 1)),
         Innovation.connections.map(c => new ConnectionVariation(c.id, 0.5, true))
     );
-    const neuralNetwork = new NeuralNetwork();
+    const neuralNetwork = new NeuralNetwork(
+        ActivationFunctions.linear,
+        ActivationFunctions.linear,
+        ActivationFunctions.linear
+    );
 
     expect(neuralNetwork.compute(genome, [-1, -1])).toEqual([1]);
     expect(neuralNetwork.compute(genome, [0, -1])).toEqual([1.5]);
@@ -31,7 +35,11 @@ test("Neural network should feedforward data in a fully connected network with o
         Innovation.nodes.map(n => new NodeVariation(n.id, 1)),
         Innovation.connections.map(c => new ConnectionVariation(c.id, 0.5, true))
     );
-    const neuralNetwork = new NeuralNetwork();
+    const neuralNetwork = new NeuralNetwork(
+        ActivationFunctions.linear,
+        ActivationFunctions.linear,
+        ActivationFunctions.linear
+    );
 
     expect(neuralNetwork.compute(genome, [-1, -1])).toEqual([1.5]);
     expect(neuralNetwork.compute(genome, [0, -1])).toEqual([2.25]);
@@ -52,7 +60,11 @@ test("Neural network should order nodes by layers whithout hidden layer", () => 
         Innovation.nodes.map(n => new NodeVariation(n.id, 1)),
         Innovation.connections.map(c => new ConnectionVariation(c.id, 0.5, true))
     );
-    const nn = new NeuralNetwork();
+    const nn = new NeuralNetwork(
+        ActivationFunctions.linear,
+        ActivationFunctions.linear,
+        ActivationFunctions.linear
+    );
 
     expect(nn.sortNodesByLayers(new Genome(
         Innovation.nodes.map(n => new NodeVariation(n.id, 1)),
