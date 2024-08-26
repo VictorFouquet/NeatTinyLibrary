@@ -29,3 +29,20 @@ test("Genome should detect when its network is fully connected", () => {
     );
     expect(genomeB.isFullyConnected()).toBe(false);
 });
+
+test("Genome should detect when its network is fully connected with several output nodes", () => {
+    const inputs = 2;
+    const outputs = 2;
+    Innovation.init(inputs, outputs);
+
+    const genomeA = new Genome(
+        Innovation.nodes.map(n => new NodeVariation(n.id, 1)),
+        [
+            new ConnectionVariation(new ConnectionId(1, 3), 0),
+            new ConnectionVariation(new ConnectionId(2, 3), 0),
+            new ConnectionVariation(new ConnectionId(1, 4), 0),
+            new ConnectionVariation(new ConnectionId(2, 4), 0),
+        ]
+    );
+    expect(genomeA.isFullyConnected()).toBe(true);
+});

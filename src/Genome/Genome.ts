@@ -14,6 +14,7 @@ export class Genome implements IGenome {
     nodes: INodeVariation[];
     connections: IConnectionVariation[];
     speciesId: number = -1;
+    stack = 0;
 
     constructor(nodes: INodeVariation[], connections: IConnectionVariation[] = []) {
         this.nodes = nodes;
@@ -29,14 +30,17 @@ export class Genome implements IGenome {
      */
     isFullyConnected(): boolean { // TODO: update for nodes x comparison
         const sorted = this.nodes.sort((a,b) => a.x - b.x);
+        let legal = 0;
         for (let i = 0; i < sorted.length; i++) {
-            for (let j = i + 1; j < sorted.length; j++) {
-                if (sorted[j].x === 0) {
-                    continue;
-                }
-
+            for (let j = 0; j < sorted.length; j++) {
                 if (
+                    sorted[i].id !== sorted[j].id && // Cant link node to itself
+                    sorted[i].x <= sorted[j].x &&    // Cant link from right to left
+                    !sorted[j].isInput &&            // Cant link towards input
+                    !sorted[i].isOutput &&           // Cant link from output
+                    // Cant duplicate connection
                     !this.containsConnection(new ConnectionId(sorted[i].id, sorted[j].id)) &&
+                    // Cant make connection bi directional
                     !this.containsConnection(new ConnectionId(sorted[j].id, sorted[i].id))
                 )
                     return false;
@@ -120,15 +124,20 @@ export class Genome implements IGenome {
     }
 
     addConnection(): IConnectionVariation {
-        if (this.isFullyConnected()) {
+        this.stack ++;
+        if (this.isFullyConnected() || this.getLegalConnections().length === 0) {
             throw new FullyConnectedError()
         }
         const validIn = this.filterOutputNodes();
-        let nodeA = validIn[Math.floor(Math.random() * validIn.length)];
+        let nodeA = validIn.splice(Math.floor(Math.random() * validIn.length), 1)[0];
 
         // Gets valid nodes to create a connection
         const validOut = this.filterInputNodes().filter(n => !n.equals(nodeA));
 
+        if (this.stack === 49) {
+            // console.log("Connections", this.connections)
+            // console.log("CHECK BEFORE", nodeA, validIn, validOut)
+        }
         // Selects node B to link to node A
         let index = Math.floor(Math.random() * validOut.length);
         let nodeB = validOut.splice(index, 1)[0];
@@ -143,7 +152,11 @@ export class Genome implements IGenome {
         }
 
         // If no linkage could be done from nodeA, restart from beginning
-        if (validOut.length === 0 && !this.connectionIsLegal(nodeA.id, nodeB.id)) {
+        if (validOut.length === 0 && !this.connectionIsLegal(nodeA.id, nodeB.id) && this.stack < 50) {
+            //console.log("STACK", this.stack)
+            if (this.stack === 49) {
+                //console.log(this.connections, this.nodes)
+            }
             return this.addConnection();
         }
 
@@ -164,8 +177,8 @@ export class Genome implements IGenome {
         connection.enabled = false;
 
         const node = Innovation.createHiddenNode();
-        
         const variationNode = new NodeVariation(node.id, Math.random());
+
         this.nodes.push(variationNode);
 
         this.connections.push(
@@ -232,6 +245,23 @@ export class Genome implements IGenome {
         return this.getNode(in_).x <= this.getNode(out).x &&
                !this.containsConnection(new ConnectionId(in_, out)) &&
                !this.containsConnection(new ConnectionId(out, in_));
+    }
+
+    getLegalConnections(): IConnectionId[] {
+        const legal: IConnectionId[] = [];
+        for (let i = 0; i < this.nodes.length; i++) {
+            for (let j = 0; j < this.nodes.length; j++) {
+                if (i === j || this.nodes[j].x === 0) {
+                    continue;
+                }
+                if (this.connectionIsLegal(this.nodes[i].id, this.nodes[j].id)) {
+                    legal.push(new ConnectionId(
+                        this.nodes[i].id, this.nodes[j].id
+                    ));
+                }
+            }
+        }
+        return legal;
     }
     
     getConnection(id: IConnectionId): IConnectionVariation|null {
