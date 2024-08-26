@@ -23,6 +23,7 @@ export class Population implements IPopulation {
 
     computeScores(): void {
         // Assign each individual to its species according to its genome
+        this.averageScore = 0;
         this.groupIndividualsBySpecies();
         let speciesCount = 0;
         for (let [species, individuals] of Object.entries(this._currentGeneration)) {
@@ -32,13 +33,13 @@ export class Population implements IPopulation {
                 individual.fitness = this.evaluateIndividual(individual);
                 individual.adjustedFitness = individual.fitness / individuals.length;
                 speciesScore += individual.adjustedFitness;
+                this.averageScore += individual.adjustedFitness;
             }
             const averageScore = speciesScore / individuals.length;
-            this.averageScore += averageScore;
             Speciation.setScore(+species, averageScore);
         }
-        if (speciesCount > 0)
-            this.averageScore /= speciesCount;
+
+        this.averageScore /= this.individuals.length;
     }
 
     evaluateIndividual(individual: IIndividual): number {
@@ -47,6 +48,7 @@ export class Population implements IPopulation {
 
     crossOver(): IIndividual[] {
         const newGeneration: IIndividual[] = [];
+
         for (let [species, individuals] of Object.entries(this._currentGeneration)) {
             const offspringCount = Math.round(
                 Speciation.getSpecies(+species).score / 
@@ -54,7 +56,7 @@ export class Population implements IPopulation {
                 individuals.length
             );
             
-            const parentsToSave = Math.max(1, offspringCount * 0.2);
+            const parentsToSave = Math.round(Math.max(1, offspringCount * 0.2));
             const childrenToCreate = offspringCount - parentsToSave;
             for (let i = 0; i < childrenToCreate; i++) {
                 let parent1 = individuals[Math.floor(Math.random() * individuals.length)];
@@ -62,17 +64,19 @@ export class Population implements IPopulation {
                 while (parent1 === parent2 && individuals.length > 1) {
                     parent2 = individuals[Math.floor(Math.random() * individuals.length)];
                 }
+
                 if (parent1.adjustedFitness! < parent2.adjustedFitness!) {
                     [parent1, parent2] = [parent2, parent1];
                 }
                 const childGenome = parent1.genome.crossover(parent2.genome);
                 childGenome.speciesId = +species;
+
                 newGeneration.push(new Individual(childGenome));
             }
 
             const parents = individuals.slice();
             for (let i = 0; i < parentsToSave; i++) {
-                newGeneration.push(parents.splice(Math.floor(Math.random() * parents.length), 1)[0])
+                newGeneration.push(parents[Math.floor(Math.random() * parents.length)])
             }
         }
 
@@ -119,7 +123,6 @@ export class Population implements IPopulation {
             if (force === false && Math.random() < Neat.config.mutationThreshold) {
                 continue;
             }
-
             const genome = indiv.genome;
 
             const rand = rand_ !== undefined ? rand_ : Math.random();
@@ -158,17 +161,24 @@ export class Population implements IPopulation {
     }
 
     evolve(): IIndividual[] {
-        // this.computeScores();
-        // const offspring = this.crossOver();
-        // this.extinct(offspring.map(i => i.speciesId!));
-        // this.mutate(offspring);
-        // return offspring;
-        return [];
+        this.computeScores();
+        const offspring = this.crossOver();
+        this.extinct(Object.keys(this._currentGeneration).map(i => +i));
+        this.mutate(offspring);
+        this.individuals = offspring;
+
+        return offspring;
+        // return [];
     }
 
     live(): boolean {
         if (this.environment.shouldTriggerNewGeneration()) {
             this.evolve()
+
+            for (let i = 0; i < this.individuals.length; i++) {
+                this.individuals[i].fitness = 0;
+                this.individuals[i].adjustedFitness = 0;
+            }
         }
         for (let indiv of this.individuals) {
             const inputs = this.environment.getInput(indiv);
