@@ -18,6 +18,7 @@ export class Genome implements IGenome {
     constructor(nodes: INodeVariation[], connections: IConnectionVariation[] = []) {
         this.nodes = nodes;
         this.connections = connections;
+        this.setNodesX();
     }
 
     /**
@@ -27,7 +28,6 @@ export class Genome implements IGenome {
      * @returns full connectivity status
      */
     isFullyConnected(): boolean { // TODO: update for nodes x comparison
-        this.setNodesX();
         const sorted = this.nodes.sort((a,b) => a.x - b.x);
         for (let i = 0; i < sorted.length; i++) {
             for (let j = i + 1; j < sorted.length; j++) {
@@ -136,20 +136,14 @@ export class Genome implements IGenome {
         let connectionId = new ConnectionId(nodeA.id, nodeB.id);
 
         // Avoid duplicating a connection inside the genome
-        while ( // TODO - Update logic for nodes x comparison
-            (
-                this.containsConnection(new ConnectionId(nodeB.id, nodeA.id)) ||
-                this.containsConnection(connectionId)
-            ) &&
-            validOut.length > 0
-        ) {
+        while (!this.connectionIsLegal(nodeA.id, nodeB.id) && validOut.length > 0) {
             index = Math.floor(Math.random() * validOut.length);
             nodeB = validOut.splice(index)[0];
             connectionId = new ConnectionId(nodeA.id, nodeB.id);
         }
 
         // If no linkage could be done from nodeA, restart from beginning
-        if (validOut.length === 0 && this.containsConnection(connectionId) || this.containsConnection(new ConnectionId(nodeB.id, nodeA.id))) {
+        if (validOut.length === 0 && !this.connectionIsLegal(nodeA.id, nodeB.id)) {
             return this.addConnection();
         }
 
@@ -160,6 +154,7 @@ export class Genome implements IGenome {
         const connection = new ConnectionVariation(connectionId, 1, true);
 
         this.connections.push(connection);
+        this.setNodesX();
 
         return connection;
     }
@@ -190,6 +185,8 @@ export class Genome implements IGenome {
                 connection.weight
             )
         );
+
+        this.setNodesX();
 
         return variationNode;
     }
@@ -229,6 +226,12 @@ export class Genome implements IGenome {
 
     containsConnection(id: IConnectionId): boolean {
         return this.getConnection(id) !== null;
+    }
+
+    connectionIsLegal(in_: number, out: number): boolean {
+        return this.getNode(in_).x <= this.getNode(out).x &&
+               !this.containsConnection(new ConnectionId(in_, out)) &&
+               !this.containsConnection(new ConnectionId(out, in_));
     }
     
     getConnection(id: IConnectionId): IConnectionVariation|null {

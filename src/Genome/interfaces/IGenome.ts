@@ -27,6 +27,7 @@ export interface IGenome {
     mutateConnectionWeightShift(id: IConnectionId): IConnectionVariation
     mutateConnectionEnabled(id: IConnectionId):     IConnectionVariation;
     containsConnection(id: IConnectionId):          boolean;
+    connectionIsLegal(in_: number, out: number):    boolean;
 
     getNode(id: number):        INodeVariation|null;
     getRandomNode():            INodeVariation;
