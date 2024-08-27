@@ -9,9 +9,9 @@ export class Individual implements IIndividual {
     adjustedFitness: number = 0;
     outputs: number[] = [];
 
-    constructor(genome: IGenome) {
+    constructor(genome: IGenome, nn: INeuralNetwork = new NeuralNetwork()) {
         this.genome = genome;
-        this.neuralNetwork = new NeuralNetwork()
+        this.neuralNetwork = nn;
     }
 
     get speciesId(): number|null { return this.genome.speciesId; }

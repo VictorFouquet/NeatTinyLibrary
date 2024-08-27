@@ -2,6 +2,7 @@ import { IConnectionId, IConnectionVariation } from "../../Connection";
 import { INodeVariation } from "../../Node";
 
 export interface IGenome {
+    id: number;
     nodes: INodeVariation[];
     connections: IConnectionVariation[];
     speciesId: number;
@@ -16,6 +17,8 @@ export interface IGenome {
     getOutputNodes():    INodeVariation[];
     filterInputNodes():  INodeVariation[];
     filterOutputNodes(): INodeVariation[];
+    sortNodesByLayer():  number[][]
+    setNodesX():         void;
 
     getConnection(id: IConnectionId):               IConnectionVariation|null;
     getRandomConnection():                          IConnectionVariation;
@@ -25,6 +28,7 @@ export interface IGenome {
     mutateConnectionWeightShift(id: IConnectionId): IConnectionVariation
     mutateConnectionEnabled(id: IConnectionId):     IConnectionVariation;
     containsConnection(id: IConnectionId):          boolean;
+    connectionIsLegal(in_: number, out: number):    boolean;
 
     getNode(id: number):        INodeVariation|null;
     getRandomNode():            INodeVariation;

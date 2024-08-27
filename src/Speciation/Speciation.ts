@@ -52,7 +52,6 @@ export class Speciation {
     static speciate(genome: IGenome, threshold: number = 4): number {
         for (let id of Speciation._activeSpecies) {
             const distance = genome.distance(Speciation._species[id].representative);
-
             if (distance < threshold) {
                 genome.speciesId = id;
                 return id;

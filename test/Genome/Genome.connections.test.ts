@@ -96,10 +96,11 @@ test("Genome should trigger the creation of a new connection in the Innovation",
     );
     // Adding a node will create 2 new connections, so now Innovation should have 4 connections
     genome.addNode();
+
     expect(Innovation.connections).toHaveLength(4);
     expect(Innovation.connectionsCount).toBe(4);
     // As the genome doesnt have a fully connected network, it should be able to add a new connection
-    expect(() => genome.addConnection()).not.toThrow(FullyConnectedError);
+    expect(() => genome.addConnection()).not.toThrow(Error);
     // Now the Innovation should have 5 connections
     expect(Innovation.connections).toHaveLength(5);
     expect(Innovation.connectionsCount).toBe(5);
