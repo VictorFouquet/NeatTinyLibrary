@@ -24,7 +24,7 @@ export class NeuralNetwork implements INeuralNetwork {
         const inputNodes = genome.getInputNodes();
 
         for (let i = 0; i < inputNodes.length; i++) {
-            inputNodes[i].output = this.inputActivation(inputs[i]);
+            inputNodes[i].output = inputs[i];
         }
         const layers = genome.sortNodesByLayer();
 

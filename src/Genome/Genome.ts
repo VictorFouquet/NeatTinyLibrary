@@ -26,7 +26,15 @@ export class Genome implements IGenome {
         this.id = Genome.currentId;
         this.nodes = nodes;
         this.connections = connections;
-        this.setNodesX();
+        const inputs = this.getInputNodes();
+        const outputs = this.getOutputNodes();
+        for (let input of inputs) {
+            input.x = 0;
+        }
+        for (let output of outputs) {
+            output.x = 1;
+        }
+        // this.setNodesX();
     }
 
     /**
@@ -42,7 +50,7 @@ export class Genome implements IGenome {
             for (let j = 0; j < sorted.length; j++) {
                 if (
                     sorted[i].id !== sorted[j].id && // Cant link node to itself
-                    sorted[i].x <= sorted[j].x &&    // Cant link from right to left
+                    sorted[i].x < sorted[j].x &&    // Cant link from right to left
                     !sorted[j].isInput &&            // Cant link towards input
                     !sorted[i].isOutput &&           // Cant link from output
                     // Cant duplicate connection
@@ -106,7 +114,7 @@ export class Genome implements IGenome {
     crossover(other: IGenome): IGenome {
         const childConns = this.crossoverConnections(other);
         const child = new Genome(this.getNodesFromConnections(childConns), childConns);
-        
+        //Genome.logger.logCrossOver(this, other, child);
         return child;
     }
 
@@ -138,10 +146,9 @@ export class Genome implements IGenome {
 
         const nodes = this.getNodesFromConnections(childConns);
         const checkGenome = new Genome(nodes, childConns);
-        checkGenome.setNodesX();
-        Genome.logger.logCrossOver(this, other, checkGenome);
+        // checkGenome.setNodesX();
         if (idx1 < parent1Conns.length) {
-            childConns.push(...(parent1Conns.splice(idx1).filter(c => checkGenome.connectionIsLegal(c.in, c.out))));
+            childConns.push(...parent1Conns.splice(idx1));
         }
 
         return childConns;
@@ -194,13 +201,16 @@ export class Genome implements IGenome {
         if (!Innovation.connectionExists(connectionId)) {
             Innovation.createConnection(connectionId.in, connectionId.out);
         }
-        const connection = new ConnectionVariation(connectionId, 1, true);
-        this.connections.push(connection);
-        this.setNodesX();
-
-        Genome.logger.logAddConnection(this, connection);
-
-        return connection;
+        if (this.connectionIsLegal(connectionId.in, connectionId.out)) {
+            const connection = new ConnectionVariation(connectionId, 1, true);
+            this.connections.push(connection);
+            // this.setNodesX();
+    
+            //Genome.logger.logAddConnection(this, connection);
+            return connection
+        }
+        throw new Error("Connection mutation could not be made")
+        //return connection;
     }
 
     addNode(): INodeVariation {
@@ -209,6 +219,9 @@ export class Genome implements IGenome {
 
         const node = Innovation.createHiddenNode();
         const variationNode = new NodeVariation(node.id, Math.random());
+        const nodeIn = this.getNode(connection.in)!;
+        const nodeOut = this.getNode(connection.out)!;
+        variationNode.x = nodeIn.x + (nodeOut.x - nodeIn.x) * 0.5;
 
         this.nodes.push(variationNode);
 
@@ -226,8 +239,8 @@ export class Genome implements IGenome {
         )
         this.connections.push(conn1, conn2);
 
-        this.setNodesX();
-        Genome.logger.logAddNode(this, node.id, conn1, conn2);
+        // this.setNodesX();
+        //Genome.logger.logAddNode(this, node.id, conn1, conn2);
 
         return variationNode;
     }
@@ -276,7 +289,7 @@ export class Genome implements IGenome {
         const node1 = this.getNode(in_);
         const node2 = this.getNode(out);
         return node1.id !== node2.id &&      // Cant link node to itself
-                node1.x <= node2.x &&        // Cant link from right to left
+                node1.x < node2.x &&        // Cant link from right to left
                 !node2.isInput &&            // Cant link towards input
                 !node1.isOutput &&           // Cant link from output
                 // Cant duplicate connection
@@ -408,11 +421,11 @@ export class Genome implements IGenome {
             const nodeOutId = conn.id.out;
 
             if (!nodesIds.has(nodeInId)) {
-                nodes.push(this.nodes.filter(n => n.id === nodeInId)[0]);
+                nodes.push(this.getNode(nodeInId)!);
                 nodesIds.add(nodeInId);
             }
             if (!nodesIds.has(nodeOutId)) {
-                nodes.push(this.nodes.filter(n => n.id === nodeOutId)[0]);
+                nodes.push(this.getNode(nodeOutId));
                 nodesIds.add(nodeOutId);
             }
         }

@@ -31,8 +31,16 @@ class XorEnviromnent implements IEnvironment {
 
     handleDecision(indiv: IIndividual): void {
         const deltaA = Math.abs(indiv.outputs[0] - this.dataset[this.current].Y[0]);
-        const deltaB = Math.abs(indiv.outputs[1] - this.dataset[this.current].Y[1]);
-        indiv.fitness += 2 - deltaA - deltaB;
+        // const deltaB = Math.abs(indiv.outputs[1] - this.dataset[this.current].Y[1]);
+        // if (indiv.outputs[0] > indiv.outputs[1]) {
+        //     if (this.dataset[this.current].Y[0] === 1)
+        //         indiv.fitness += 1;
+        // } else if (indiv.outputs[0] < indiv.outputs[1]) {
+        //     if (this.dataset[this.current].Y[0] === 0)
+        //         indiv.fitness += 1;
+        // }
+        
+        indiv.fitness += 1 - deltaA// - deltaB;
     }
 
     evaluate(indiv: IIndividual): number {
@@ -64,21 +72,37 @@ test("Population should solve Xor problem", () => {
             ),
             new NeuralNetwork(
                 ActivationFunctions.linear,
-                ActivationFunctions.sigmoid,
-                ActivationFunctions.sigmoid
+                ActivationFunctions.tanh,
+                ActivationFunctions.tanh
             )
         ));
     }
     const xorEnv = new XorEnviromnent();
     const population = new Population(xorEnv, individuals);
 
-    for (let i = 0; i < 400; i++) {
+    for (let i = 0; i < 100; i++) {
         population.live();
-        console.log(population.averageScore);
+        if (i % 4 === 0) {
+
+            console.log(population.averageScore);
+            const fittest = population.individuals.sort((a,b) => b.adjustedFitness - a.adjustedFitness)[0];
+        
+            fittest.makeDecision([0, 0])
+            console.log(fittest.fitness, fittest.outputs)
+        }
     }
 
-    const fittest = population.individuals.sort((a,b) => b.fitness - a.fitness)[0];
+    const fittest = population.individuals.sort((a,b) => b.adjustedFitness - a.adjustedFitness)[0];
+    
     fittest.makeDecision([0, 0])
+    console.log(fittest.outputs)
+    fittest.makeDecision([1, 0])
+    console.log(fittest.outputs)
+    fittest.makeDecision([0, 1])
+    console.log(fittest.outputs)
+    fittest.makeDecision([1, 1])
+    console.log(fittest.outputs)
+
     expect(fittest.outputs[0]).toBeLessThan(0.5)
     fittest.makeDecision([1, 1])
     expect(fittest.outputs[0]).toBeLessThan(0.5)

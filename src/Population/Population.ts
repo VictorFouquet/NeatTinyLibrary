@@ -62,7 +62,7 @@ export class Population implements IPopulation {
                 let x = 0;
                 let parent1 = individuals[Math.floor(Math.random() * individuals.length)];
                 let parent2 = parent1;
-                while (parent1 === parent2 && individuals.length > 1 && x < 50) {
+                while (parent1 === parent2 && individuals.length > 1) {
                     x++
                     parent2 = individuals[Math.floor(Math.random() * individuals.length)];
                 }

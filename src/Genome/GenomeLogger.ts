@@ -14,12 +14,16 @@ export class GenomeLogger implements IGenomeLogger {
     }
 
     logAddConnection(genome: IGenome, connectionId: IConnectionId): void {
-        const message = `[ADD_CON] Genome ${genome.id} has added connection ${connectionId.in}-${connectionId.out}\n`;
+        const node1 = genome.getNode(connectionId.in);
+        const node2 = genome.getNode(connectionId.out);
+        const message = `[ADD_CON] Genome ${genome.id} has added connection ${connectionId.in}-${connectionId.out} from ${node1!.x} to ${node2!.x}\n`;
         fs.appendFileSync(this.output, message);
     }
 
     logCrossOver(genome1: IGenome, genome2: IGenome, child: IGenome): void {
         let message = `[CROSS] Genome ${genome1.id} was crossover with ${genome2.id} creating ${child.id}\n`;
+        message += `[CROSS] Genome ${genome1.id} had ${genome1.connections.map(c => c.id.toString()).join(" ")}\n`;
+        message += `[CROSS] Genome ${genome2.id} had ${genome2.connections.map(c => c.id.toString()).join(" ")}\n`;
         for (let connection of child.connections) {
             message += `[CROSS] It inherited connection ${connection.id.toString()}\n`;
         }
